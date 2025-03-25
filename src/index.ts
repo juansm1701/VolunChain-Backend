@@ -7,6 +7,8 @@ import { redisClient } from "./config/redis";
 import cors from "cors";
 import { errorHandler } from "./middlewares/errorHandler";
 import authRoutes from "./routes/authRoutes";
+import userRoutes from "./routes/userRoutes";
+import { setupRateLimiting } from "./middleware/rateLimitMiddleware";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +18,10 @@ console.info("Starting VolunChain API...");
 
 // Middleware for parsing JSON requests
 app.use(express.json());
+
+//Rate limiting
+setupRateLimiting(app);
+
 app.use(cors());
 
 // Setup Swagger only for development environment
@@ -98,7 +104,7 @@ app.get("/health", async (req, res) => {
 // Authentication routes
 app.use("/auth", authRoutes);
 
-app.use("/users");
+app.use("/users", userRoutes);
 
 // Initialize the database and start the server
 prisma
@@ -125,7 +131,7 @@ prisma
         );
       });
   })
-  .catch((error) => {
+  .catch((error: Error) => {
     console.error("Error during database initialization:", error);
   });
 
