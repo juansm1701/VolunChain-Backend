@@ -24,7 +24,7 @@
       "./node_modules/@types",
       "./src/types"
     ],
-    "types": ["node", "express"], // Tipos específicos a incluir
+    "types": ["node", "express", "jest"], // Tipos específicos a incluir
     "sourceMap": true, // Genera source maps para debugging
     "declaration": true, // Genera archivos .d.ts
     "resolveJsonModule": true, // Permite importar archivos JSON
