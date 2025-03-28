@@ -10,6 +10,7 @@ import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import { setupRateLimiting } from "./middleware/rateLimitMiddleware";
 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ENV = process.env.NODE_ENV || "development";
@@ -124,7 +125,7 @@ prisma
           }
         });
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(
           "Server failed to start due to Redis initialization error:",
           error
