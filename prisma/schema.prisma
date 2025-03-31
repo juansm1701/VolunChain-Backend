@@ -3,35 +3,35 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"       // Specifies PostgreSQL as the database provider
+  provider = "postgresql" // Specifies PostgreSQL as the database provider
   url      = env("DATABASE_URL") // Loads the database connection URL from environment variables
 }
 
 // User model represents a system user
 model User {
-  id        String @id @default(uuid()) // Unique identifier
-  createdAt DateTime @default(now()) // Timestamp for record creation
-  updatedAt DateTime @updatedAt // Timestamp for record update
-  name      String
-  lastName  String
-  email     String @unique // Unique email constraint
-  password  String
-  wallet    String @unique // Unique wallet identifier
-  nfts      NFT[]   @relation("UserNFTs") // One-to-many relationship with NFTs
+  id             String          @id @default(uuid()) // Unique identifier
+  createdAt      DateTime        @default(now()) // Timestamp for record creation
+  updatedAt      DateTime        @updatedAt // Timestamp for record update
+  name           String
+  lastName       String
+  email          String          @unique // Unique email constraint
+  password       String
+  wallet         String          @unique // Unique wallet identifier
+  nfts           NFT[]           @relation("UserNFTs") // One-to-many relationship with NFTs
   userVolunteers UserVolunteer[] @relation("UserToVolunteer") // Relation to UserVolunteer
 }
 
 // Organization model represents an entity like a company or group
 model Organization {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   name      String
-  email     String   @unique
+  email     String    @unique
   password  String
   category  String
-  wallet    String   @unique
-  nfts      NFT[]    @relation("OrganizationNFTs") // One-to-many relationship with NFTs
+  wallet    String    @unique
+  nfts      NFT[]     @relation("OrganizationNFTs") // One-to-many relationship with NFTs
   projects  Project[] // Add this line for the opposite relation
 }
 
@@ -44,15 +44,15 @@ model BaseEntity {
 
 // NFT model represents a Non-Fungible Token
 model NFT {
-  id             String       @id @default(uuid())
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id             String   @id @default(uuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
   userId         String // Foreign key for User
   organizationId String // Foreign key for Organization
   description    String
 
-  user          User          @relation(fields: [userId], references: [id], name: "UserNFTs")
-  organization  Organization  @relation(fields: [organizationId], references: [id], name: "OrganizationNFTs")
+  user         User         @relation(fields: [userId], references: [id], name: "UserNFTs")
+  organization Organization @relation(fields: [organizationId], references: [id], name: "OrganizationNFTs")
 
   @@index([userId]) // Index for quick lookup
   @@index([organizationId])
@@ -60,15 +60,15 @@ model NFT {
 
 // Project model represents a project within the system
 model Project {
-  id             String      @id @default(uuid())
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  name           String      @db.VarChar(255)
+  id             String       @id @default(uuid())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  name           String       @db.VarChar(255)
   description    String
-  location       String      @db.VarChar(255)
+  location       String       @db.VarChar(255)
   startDate      DateTime
   endDate        DateTime
-  organizationId String      // Add this field
+  organizationId String // Add this field
   organization   Organization @relation(fields: [organizationId], references: [id]) // Add this relation
   volunteers     Volunteer[]
 }
@@ -85,8 +85,8 @@ model TestItem {
 
 // UserVolunteer model represents the relationship between Users and Volunteers
 model UserVolunteer {
-  userId      String    // Foreign key for User
-  volunteerId String    // Foreign key for Volunteer
+  userId      String // Foreign key for User
+  volunteerId String // Foreign key for Volunteer
   joinedAt    DateTime  @default(now()) // Timestamp for when the user joined as a volunteer
   user        User      @relation(fields: [userId], references: [id], name: "UserToVolunteer")
   volunteer   Volunteer @relation(fields: [volunteerId], references: [id], name: "VolunteerToUser")
@@ -96,15 +96,15 @@ model UserVolunteer {
 
 // Volunteer model represents a volunteer position within a project
 model Volunteer {
-  id           String   @id @default(uuid())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  name         String   @db.VarChar(255)
-  description  String   @db.VarChar(255)
-  requirements String   @db.VarChar(255)
-  incentive    String?  // Optional field for incentives
-  projectId    String // Foreign key for Project
-  project      Project  @relation(fields: [projectId], references: [id])
+  id             String          @id @default(uuid())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  name           String          @db.VarChar(255)
+  description    String          @db.VarChar(255)
+  requirements   String          @db.VarChar(255)
+  incentive      String? // Optional field for incentives
+  projectId      String // Foreign key for Project
+  project        Project         @relation(fields: [projectId], references: [id])
   userVolunteers UserVolunteer[] @relation("VolunteerToUser") // Relation to UserVolunteer
 
   @@index([projectId]) // Index for quick lookup
@@ -136,3 +136,10 @@ model users {
   escrows       escrows[]
 }
 
+model Photo {
+  id         String   @id @default(uuid())
+  url        String
+  userId     String
+  uploadedAt DateTime @default(now())
+  metadata   Json?
+}
