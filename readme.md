@@ -52,21 +52,25 @@ src/
 ```
 
 ### Domain Layer
+
 - Contains business entities and value objects
 - Implements domain logic and business rules
 - Independent of external concerns
 
 ### Repository Layer
+
 - Defines interfaces for data access
 - Implements data persistence logic
 - Abstracts database operations
 
 ### Use Cases Layer
+
 - Implements application business logic
 - Orchestrates domain objects
 - Handles transaction boundaries
 
 ### DTO Layer
+
 - Defines data structures for API communication
 - Handles data validation and transformation
 - Separates domain models from API contracts
