@@ -1,59 +1,25 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-
-/**
- * Photo entity representing images uploaded by users in the system
- */
-@Entity('photos')
 export class Photo {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  id?: string;
   url: string;
-
-  @Column({ type: 'uuid', nullable: false })
   userId: string;
+  uploadedAt?: Date;
+  metadata?: Record<string, any>;
 
-  @CreateDateColumn()
-  uploadedAt: Date;
-
-  @Column({ type: 'jsonb', nullable: true, default: {} })
-  metadata: Record<string, any>;
-
-  /**
-   * Creates a new Photo instance
-   * @param props Photo properties
-   */
-  constructor(props?: Partial<Photo>) {
-    if (props) {
-      Object.assign(this, props);
-    }
+  constructor(props: any) {
+    this.id = props.id;
+    this.url = props.url;
+    this.userId = props.userId;
+    this.uploadedAt = props.uploadedAt;
+    this.metadata = props.metadata ?? {};
   }
 
-  /**
-   * Validates that the Photo entity has all required fields
-   * @returns true if valid, throws error otherwise
-   */
   validate(): boolean {
-    if (!this.url) {
-      throw new Error('Photo URL is required');
-    }
-    
-    if (!this.url.match(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/)) {
-      throw new Error('Photo URL is invalid');
-    }
-
-    if (!this.userId) {
-      throw new Error('User ID is required');
-    }
-
+    if (!this.url) throw new Error('Photo URL is required');
+    if (!/^https?:\/\/.+$/.test(this.url)) throw new Error('Photo URL is invalid');
+    if (!this.userId) throw new Error('User ID is required');
     return true;
   }
 
-  /**
-   * Updates the metadata of the photo
-   * @param newMetadata The metadata to merge with existing metadata
-   */
   updateMetadata(newMetadata: Record<string, any>): void {
     this.metadata = { ...this.metadata, ...newMetadata };
   }
