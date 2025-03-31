@@ -13,10 +13,12 @@ model User {
   createdAt DateTime @default(now()) // Timestamp for record creation
   updatedAt DateTime @updatedAt // Timestamp for record update
   name      String
-  lastName  String
+  lastName  String?
   email     String @unique // Unique email constraint
   password  String
   wallet    String @unique // Unique wallet identifier
+  isVerified         Boolean  @default(false)
+  verificationToken  String?
   nfts      NFT[]   @relation("UserNFTs") // One-to-many relationship with NFTs
   userVolunteers UserVolunteer[] @relation("UserToVolunteer") // Relation to UserVolunteer
 }
