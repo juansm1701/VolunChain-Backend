@@ -7,24 +7,24 @@ RUN apt-get update && apt-get install -y postgresql-client
 # Establece el directorio de trabajo
 WORKDIR /app
 
-# Copia solo los archivos de dependencias primero para optimizar la caché
+# Copia los archivos necesarios para instalar dependencias
 COPY package*.json ./
+COPY tsconfig.json ./
 
-# Instala las dependencias
+# Instala dependencias
 RUN npm install
 
-# Copia el resto del código
+# Copia todo el código al contenedor
 COPY . .
 
+# Compila TypeScript
+RUN npm run build
+
 # Copia y da permisos al entrypoint
-COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-# Genera el cliente de Prisma
-RUN npx prisma generate
-
-# Expone el puerto 3000
-EXPOSE 3000
-
-# Usa el entrypoint en lugar de CMD
+# Ejecuta las migraciones y levanta la app
 ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Expone el puerto que usará la app
+EXPOSE 3000
