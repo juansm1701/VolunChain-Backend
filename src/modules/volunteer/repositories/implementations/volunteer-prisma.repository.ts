@@ -51,7 +51,7 @@ export class VolunteerPrismaRepository implements IVolunteerRepository {
       take: pageSize,
     });
 
-    return volunteers.map((v) =>
+    return volunteers.map((v: any) =>
       Volunteer.create({
         ...v,
         id: v.id,
