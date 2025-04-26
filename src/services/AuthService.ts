@@ -24,16 +24,24 @@ import bcrypt from "bcryptjs";
 import { prisma } from "../config/prisma";
 import { sendVerificationEmail } from "../utils/email.utils";
 
-const SECRET_KEY = process.env.JWT_SECRET || "defaultSecret";
+// const SECRET_KEY = process.env.JWT_SECRET || "defaultSecret";
 const EMAIL_SECRET = process.env.EMAIL_SECRET || "emailSecret";
+const JWT_SECRET = process.env.JWT_SECRET || "default";
 
 class AuthService {
-  async register(name: string, email: string, password: string, wallet: string) {
+  async register(
+    name: string,
+    email: string,
+    password: string,
+    wallet: string
+  ) {
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) throw new Error("Email already in use");
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = jwt.sign({ email }, EMAIL_SECRET, { expiresIn: "1d" });
+    const verificationToken = jwt.sign({ email }, JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
     const user = await prisma.user.create({
       data: {
@@ -41,8 +49,8 @@ class AuthService {
         email,
         password: hashedPassword,
         wallet,
-        isVerified: false,
-        verificationToken,
+        // isVerified: false,
+        // verificationToken,
       },
     });
 
@@ -54,7 +62,9 @@ class AuthService {
   async verifyEmail(token: string) {
     try {
       const decoded = jwt.verify(token, EMAIL_SECRET) as { email: string };
-      const user = await prisma.user.findUnique({ where: { email: decoded.email } });
+      const user = await prisma.user.findUnique({
+        where: { email: decoded.email },
+      });
 
       if (!user) throw new Error("User not found");
       if (user.isVerified) return { message: "Email already verified" };
@@ -66,7 +76,9 @@ class AuthService {
 
       return { message: "Email successfully verified" };
     } catch (error) {
-      throw new Error("Invalid or expired verification token");
+      throw new Error(
+        error?.message || "Invalid or expired verification token"
+      );
     }
   }
 
@@ -87,12 +99,14 @@ class AuthService {
   }
 
   async authenticate(walletAddress: string): Promise<string> {
-    const user = await prisma.user.findUnique({ where: { wallet: walletAddress } });
+    const user = await prisma.user.findUnique({
+      where: { wallet: walletAddress },
+    });
 
     if (!user) throw new Error("User not found");
     if (!user.isVerified) throw new Error("Email not verified");
 
-    return jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: "1h" });
+    return jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1d" });
   }
 }
 
