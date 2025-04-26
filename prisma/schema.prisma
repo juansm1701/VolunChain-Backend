@@ -108,6 +108,7 @@ model Volunteer {
   projectId      String // Foreign key for Project
   project        Project         @relation(fields: [projectId], references: [id])
   userVolunteers UserVolunteer[] @relation("VolunteerToUser") // Relation to UserVolunteer
+  certificate    Certificate?
 
   @@index([projectId]) // Index for quick lookup
 }
@@ -144,4 +145,24 @@ model Photo {
   userId     String
   uploadedAt DateTime @default(now())
   metadata   Json?
+}
+
+model Certificate {
+  id            String   @id @default(cuid())
+  volunteerId   String   @unique
+  volunteer     Volunteer @relation(fields: [volunteerId], references: [id])
+  filePath      String
+  uniqueId      String   @unique
+  customMessage String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  downloads     CertificateDownloadLog[]
+}
+
+model CertificateDownloadLog {
+  id            String   @id @default(cuid())
+  certificateId String
+  userId        String
+  timestamp     DateTime @default(now())
+  certificate   Certificate @relation(fields: [certificateId], references: [id])
 }
