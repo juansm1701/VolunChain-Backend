@@ -28,7 +28,8 @@ class ProjectService {
     description: string,
     location: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
+    organizationId: string
   ): Promise<Project> {
     const project = await this.projectRepo.create({
       data: {
@@ -40,6 +41,7 @@ class ProjectService {
         volunteers: {
           create: [], // Initialize with empty volunteers array
         },
+        organizationId,
       },
       include: {
         volunteers: {
