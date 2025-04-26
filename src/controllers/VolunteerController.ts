@@ -1,30 +1,21 @@
 import { Request, Response } from "express";
 import VolunteerService from "../services/VolunteerService";
+import { CreateVolunteerDTO } from "../modules/volunteer/dto/volunteer.dto";
 
 export default class VolunteerController {
   private volunteerService = new VolunteerService();
 
   async createVolunteer(req: Request, res: Response): Promise<void> {
     try {
-      const { name, description, requirements, incentive, projectId } =
-        req.body;
-      const volunteer = await this.volunteerService.createVolunteer(
-        name,
-        description,
-        requirements,
-        incentive,
-        projectId
-      );
+      const volunteerData: CreateVolunteerDTO = req.body;
+      const volunteer =
+        await this.volunteerService.createVolunteer(volunteerData);
       res.status(201).json(volunteer);
     } catch (error) {
-      res
-        .status(400)
-        .json({
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        });
+      res.status(400).json({
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
     }
   }
 
@@ -38,14 +29,10 @@ export default class VolunteerController {
       }
       res.status(200).json(volunteer);
     } catch (error) {
-      res
-        .status(400)
-        .json({
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        });
+      res.status(400).json({
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
     }
   }
 
@@ -56,14 +43,10 @@ export default class VolunteerController {
         await this.volunteerService.getVolunteersByProjectId(projectId);
       res.status(200).json(volunteers);
     } catch (error) {
-      res
-        .status(400)
-        .json({
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        });
+      res.status(400).json({
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
     }
   }
 }
