@@ -5,22 +5,15 @@ import authMiddleware from "../middleware/authMiddleware";
 const router = Router();
 
 // Public routes
-router.post("/organizations", OrganizationController.createOrganization);
-router.get("/organizations", OrganizationController.getAllOrganizations);
-router.get("/organizations/:id", OrganizationController.getOrganizationById);
-router.get(
-  "/organizations/email/:email",
-  OrganizationController.getOrganizationByEmail
-);
+router.post("/", OrganizationController.createOrganization);
+router.get("/", OrganizationController.getAllOrganizations);
+router.get("/:id", OrganizationController.getOrganizationById);
+router.get("/email/:email", OrganizationController.getOrganizationByEmail);
 
 // Protected routes
-router.put(
-  "/organizations/:id",
-  authMiddleware,
-  OrganizationController.updateOrganization
-);
+router.put("/:id", authMiddleware, OrganizationController.updateOrganization);
 router.delete(
-  "/organizations/:id",
+  "/:id",
   authMiddleware,
   OrganizationController.deleteOrganization
 );
