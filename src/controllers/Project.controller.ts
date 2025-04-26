@@ -6,13 +6,21 @@ class ProjectController {
 
   async createProject(req: Request, res: Response): Promise<void> {
     try {
-      const { name, description, location, startDate, endDate } = req.body;
+      const {
+        name,
+        description,
+        location,
+        startDate,
+        endDate,
+        organizationId,
+      } = req.body;
       const project = await this.projectService.createProject(
         name,
         description,
         location,
         new Date(startDate),
-        new Date(endDate)
+        new Date(endDate),
+        organizationId
       );
       res.status(201).json(project);
     } catch (error) {
