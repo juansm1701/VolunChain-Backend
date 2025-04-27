@@ -1,20 +1,14 @@
 import { Request, Response } from "express";
 import VolunteerService from "../services/VolunteerService";
+import { CreateVolunteerDTO } from "../modules/volunteer/dto/volunteer.dto";
 
 export default class VolunteerController {
   private volunteerService = new VolunteerService();
 
   async createVolunteer(req: Request, res: Response): Promise<void> {
     try {
-      const { name, description, requirements, incentive, projectId } =
-        req.body;
-      const volunteer = await this.volunteerService.createVolunteer(
-        name,
-        description,
-        requirements,
-        incentive,
-        projectId
-      );
+      const volunteerData: CreateVolunteerDTO = req.body;
+      const volunteer = await this.volunteerService.createVolunteer(volunteerData);
       res.status(201).json(volunteer);
     } catch (error) {
       res
