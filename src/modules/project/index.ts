@@ -1,6 +1,6 @@
 export * from './domain/Project';
 export * from './repositories/IProjectRepository';
-export * from './repositories/PrismaProjectRepository';
+// export * from './repositories/PrismaProjectRepository';
 export * from './dto/CreateProjectDto';
 export * from './dto/UpdateProjectDto';
 export * from './use-cases/CreateProjectUseCase';

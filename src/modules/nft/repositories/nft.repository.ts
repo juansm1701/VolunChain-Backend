@@ -2,6 +2,16 @@ import { PrismaClient } from "@prisma/client";
 import { INFTRepository } from "./INFTRepository";
 import { NFT } from "../domain/entities/nft.entity";
 
+// Define our own types based on the Prisma schema
+interface PrismaNFT {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  organizationId: string;
+  description: string;
+}
+
 export class NFTRepository implements INFTRepository {
   private prisma = new PrismaClient();
 
@@ -12,7 +22,8 @@ export class NFTRepository implements INFTRepository {
         organizationId: nft.organizationId,
         description: nft.description,
       },
-    });
+    }) as unknown as PrismaNFT;
+    
     return new NFT(
       newNFT.id,
       newNFT.userId,
@@ -23,7 +34,7 @@ export class NFTRepository implements INFTRepository {
   }
 
   async findById(id: string): Promise<NFT | null> {
-    const nft = await this.prisma.nFT.findUnique({ where: { id } });
+    const nft = await this.prisma.nFT.findUnique({ where: { id } }) as unknown as PrismaNFT | null;
     return nft
       ? new NFT(
           nft.id,
@@ -53,7 +64,7 @@ export class NFTRepository implements INFTRepository {
     ]);
 
     return {
-      nfts: nfts.map(
+      nfts: (nfts as unknown as PrismaNFT[]).map(
         (nft) =>
           new NFT(
             nft.id,
@@ -71,7 +82,8 @@ export class NFTRepository implements INFTRepository {
     const updatedNFT = await this.prisma.nFT.update({
       where: { id },
       data: nft,
-    });
+    }) as unknown as PrismaNFT;
+    
     return new NFT(
       updatedNFT.id,
       updatedNFT.userId,

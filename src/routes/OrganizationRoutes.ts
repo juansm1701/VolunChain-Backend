@@ -1,8 +1,8 @@
-import { Router } from "express";
-import OrganizationController from "../controllers/OrganizationController";
-import authMiddleware from "../middleware/authMiddleware";
+// import { Router } from "express";
+// import OrganizationController from "../controllers/OrganizationController";
+// import authMiddleware from "../middleware/authMiddleware";
 
-const router = Router();
+// const router = Router();
 
 // Public routes
 router.post("/", OrganizationController.createOrganization);
@@ -18,4 +18,4 @@ router.delete(
   OrganizationController.deleteOrganization
 );
 
-export default router;
+// export default router;

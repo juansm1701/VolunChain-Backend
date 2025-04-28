@@ -1,5 +1,5 @@
-import { Router } from "express";
-import ProjectController from "../controllers/Project.controller";
+// import { Router } from "express";
+// import ProjectController from "../controllers/Project.controller";
 
 const router = Router();
 const projectController = new ProjectController();
@@ -12,4 +12,8 @@ router.get("/organizations/:organizationId", async (req, res) =>
   projectController.getProjectsByOrganizationId(req, res)
 );
 
-export default router;
+// export default router;
+
+
+
+
