@@ -23,5 +23,5 @@ export class Project extends BaseEntity {
   organizationId: string;
 
   @OneToMany(() => Volunteer, (volunteer) => volunteer.project)
-  volunteers!: Volunteer[];
+  volunteers?: Volunteer[];
 }

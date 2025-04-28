@@ -77,7 +77,7 @@ class AuthService {
       return { message: "Email successfully verified" };
     } catch (error) {
       throw new Error(
-        error?.message || "Invalid or expired verification token"
+        "Invalid or expired verification token"
       );
     }
   }

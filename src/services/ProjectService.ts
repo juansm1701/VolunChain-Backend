@@ -4,21 +4,42 @@ import { Volunteer } from "../entities/Volunteer";
 import { Prisma } from "@prisma/client";
 // import { Equal } from 'typeorm'; // Commented out until its usage is confirmed
 
-type PrismaProjectWithVolunteers = Prisma.ProjectGetPayload<{
-  include: {
-    volunteers: {
-      include: {
-        project: true;
-      };
-    };
-  };
-}>;
+// Define types based on the Prisma schema
+interface PrismaProject {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  name: string;
+  description: string;
+  location: string;
+  startDate: Date;
+  endDate: Date;
+  organizationId: string;
+  volunteers: PrismaVolunteer[];
+}
 
-type PrismaVolunteer = Prisma.VolunteerGetPayload<{
-  include: {
-    project: true;
+interface PrismaVolunteer {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  name: string;
+  description: string;
+  requirements: string;
+  incentive: string | null;
+  projectId: string;
+  project: {
+    id: string;
+    name: string;
+    description: string;
+    location: string;
+    startDate: Date;
+    endDate: Date;
+    createdAt: Date;
+    updatedAt: Date;
+    organizationId: string;
   };
-}>;
+}
+
 
 class ProjectService {
   private projectRepo = prisma.project;
@@ -39,7 +60,7 @@ class ProjectService {
         startDate,
         endDate,
         volunteers: {
-          create: [], // Initialize with empty volunteers array
+          create: [],
         },
         organizationId,
       },
@@ -101,12 +122,14 @@ class ProjectService {
     ]);
 
     return {
-      projects: projects.map((project) => this.mapToProject(project)),
+      projects: projects.map((project: PrismaProject) =>
+        this.mapToProject(project)
+      ),
       total,
     };
   }
 
-  private mapToProject(prismaProject: PrismaProjectWithVolunteers): Project {
+  private mapToProject(prismaProject: PrismaProject): Project {
     const project = new Project();
     project.id = prismaProject.id;
     project.name = prismaProject.name;
@@ -123,7 +146,7 @@ class ProjectService {
       volunteer.name = v.name;
       volunteer.description = v.description;
       volunteer.requirements = v.requirements;
-      volunteer.incentive = v.incentive || undefined; // Convert null to undefined
+      volunteer.incentive = v.incentive || undefined;
       volunteer.project = project;
       volunteer.createdAt = v.createdAt;
       volunteer.updatedAt = v.updatedAt;

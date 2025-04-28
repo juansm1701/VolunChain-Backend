@@ -37,7 +37,7 @@ export const downloadCertificate = async (
     await CertificateService.logDownload(cert!.id, userId);
     res.download(path);
   } catch (err) {
-    res.status(404).json({ error: err.message || "Certificate not available" });
+    res.status(404).json({ error: "Certificate not available" });
   }
 };
 
