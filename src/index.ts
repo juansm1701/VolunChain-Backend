@@ -158,8 +158,4 @@ app.use("/projects", projectRoutes);
 app.use("/volunteers", volunteerRoutes);
 app.use("/organizations", organizationRoutes);
 
-app.listen(PORT, () => {
-  console.log("VolunChain API successfully started!");
-});
-
 export default app;
