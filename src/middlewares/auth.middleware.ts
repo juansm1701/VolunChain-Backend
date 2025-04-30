@@ -1,6 +1,22 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
+// Definir interfaz para la información del usuario decodificada
+interface DecodedUser {
+  id: string;
+  email: string;
+  [key: string]: unknown;
+}
+
+// Extender la interfaz Request para incluir el campo user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: DecodedUser;
+    }
+  }
+}
+
 /**
  * Middleware que permite el acceso a la ruta incluso si el usuario no está autenticado,
  * pero si proporciona un token válido, los detalles del usuario se adjuntan a la solicitud.
@@ -26,10 +42,10 @@ export const optionalAuthMiddleware = (req: Request, res: Response, next: NextFu
   try {
     // Verificar el token si existe
     const secret = process.env.JWT_SECRET || 'default_secret';
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, secret) as DecodedUser;
     
     // Adjuntar información del usuario decodificada a la solicitud
-    (req as any).user = decoded;
+    req.user = decoded;
   } catch (error) {
     // Error al verificar el token, continuar como invitado
     console.error('Token verification failed:', error);

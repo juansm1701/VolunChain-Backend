@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { ImpactMetrics, OrganizationImpactMetrics, ProjectImpactMetrics } from '../types/metrics';
 
 // Definir interfaces propias para los tipos necesarios
-interface Project {
+interface ProjectData {
   id: string;
   name: string;
   status: string;
@@ -10,17 +10,30 @@ interface Project {
   endDate: Date;
 }
 
-interface Volunteer {
+interface VolunteerData {
   id: string;
 }
 
-interface UserVolunteer {
+interface UserVolunteerWithUser {
   userId: string;
   volunteerId: string;
   hoursContributed: number;
   user: {
     name: string;
     lastName?: string | null;
+  };
+}
+
+interface UserVolunteerData {
+  userId: string;
+  volunteerId: string;
+  hoursContributed: number;
+}
+
+interface ProjectStatusCount {
+  status: string;
+  _count: {
+    id: number;
   };
 }
 
@@ -60,14 +73,14 @@ export class MetricsRepository {
       archived: 0
     };
 
-    projectStatuses.forEach((status: { status: string; _count: { id: number } }) => {
+    projectStatuses.forEach((status: ProjectStatusCount) => {
       if (status.status === 'active' || status.status === 'completed' || status.status === 'archived') {
         statusCounts[status.status as keyof typeof statusCounts] = status._count.id;
       }
     });
 
     // Calcular promedio de horas por voluntario
-    const averageHoursPerVolunteer = totalVolunteers > 0 ? totalHours / totalVolunteers : 0;
+    const averageHoursPerVolunteer = totalVolunteers > 0 ? Number(totalHours) / totalVolunteers : 0;
 
     return {
       totalVolunteers,
@@ -93,7 +106,7 @@ export class MetricsRepository {
       where: { organizationId }
     });
 
-    const projectIds = projects.map((project: any) => project.id);
+    const projectIds = projects.map((project: ProjectData) => project.id);
 
     // Obtener voluntarios en estos proyectos
     const volunteers = await this.prisma.volunteer.findMany({
@@ -104,7 +117,7 @@ export class MetricsRepository {
       }
     });
 
-    const volunteerIds = volunteers.map((volunteer: any) => volunteer.id);
+    const volunteerIds = volunteers.map((volunteer: VolunteerData) => volunteer.id);
 
     // Obtener relaciones UserVolunteer para estos voluntarios
     const userVolunteers = await this.prisma.userVolunteer.findMany({
@@ -117,7 +130,12 @@ export class MetricsRepository {
 
     // Calcular métricas
     const totalVolunteers = userVolunteers.length;
-    const totalHours = userVolunteers.reduce((sum: number, uv: any) => sum + uv.hoursContributed, 0);
+    let totalHours = 0;
+    
+    for (const uv of userVolunteers) {
+      totalHours += Number(uv.hoursContributed);
+    }
+    
     const totalProjects = projects.length;
 
     // Contar proyectos por estado
@@ -127,7 +145,7 @@ export class MetricsRepository {
       archived: 0
     };
 
-    projects.forEach((project: any) => {
+    projects.forEach((project: ProjectData) => {
       if (project.status === 'active' || project.status === 'completed' || project.status === 'archived') {
         statusCounts[project.status as keyof typeof statusCounts]++;
       }
@@ -162,7 +180,7 @@ export class MetricsRepository {
       where: { projectId }
     });
 
-    const volunteerIds = volunteers.map((volunteer: any) => volunteer.id);
+    const volunteerIds = volunteers.map((volunteer: VolunteerData) => volunteer.id);
 
     // Obtener relaciones UserVolunteer para estos voluntarios
     const userVolunteers = await this.prisma.userVolunteer.findMany({
@@ -178,10 +196,14 @@ export class MetricsRepository {
 
     // Calcular métricas
     const totalVolunteers = userVolunteers.length;
-    const totalHours = userVolunteers.reduce((sum: number, uv: any) => sum + uv.hoursContributed, 0);
+    let totalHours = 0;
+    
+    for (const uv of userVolunteers) {
+      totalHours += Number(uv.hoursContributed);
+    }
 
     // Preparar desglose de voluntarios
-    const volunteerBreakdown = userVolunteers.map((uv: UserVolunteer) => ({
+    const volunteerBreakdown = userVolunteers.map((uv: UserVolunteerWithUser) => ({
       userId: uv.userId,
       userName: `${uv.user.name} ${uv.user.lastName || ''}`.trim(),
       hoursContributed: uv.hoursContributed

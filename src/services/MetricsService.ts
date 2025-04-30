@@ -8,11 +8,13 @@ dotenv.config();
 
 export class MetricsService {
   private metricsRepository: MetricsRepository;
-  private redisClient: any; // Redis client para caché
+  private redisClient: any;
   private CACHE_TTL = 24 * 60 * 60; // 24 horas en segundos
 
   constructor() {
     this.metricsRepository = new MetricsRepository();
+    this.redisClient = null;
+    
     // Inicializar cliente Redis si está disponible en el entorno
     try {
       const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';

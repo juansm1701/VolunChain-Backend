@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request } from 'express';
 import rateLimit from 'express-rate-limit';
 
 /**
@@ -15,8 +15,8 @@ export const rateLimiterMiddleware = rateLimit({
   },
   // Determinar el límite en función de si el usuario está autenticado o no
   keyGenerator: (req: Request) => {
-    return (req as any).user?.id 
-      ? `auth_${(req as any).user.id}` // Usuarios autenticados tienen un límite por ID
+    return req.user?.id 
+      ? `auth_${req.user.id}` // Usuarios autenticados tienen un límite por ID
       : req.ip || 'unknown'; // Usuarios no autenticados tienen un límite por IP
   }
 }); 
