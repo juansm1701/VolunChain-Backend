@@ -1,4 +1,4 @@
-import { randomBytes } from 'crypto';
+import jwt from "jsonwebtoken";
 import { IUserRepository } from '../../user/domain/interfaces/IUserRepository';
 import { ResendVerificationEmailRequestDTO, ResendVerificationEmailResponseDTO } from '../dto/email-verification.dto';
 import { sendEmail } from '../utils/email.utils';
@@ -8,6 +8,7 @@ export class ResendVerificationEmailUseCase {
 
   async execute(dto: ResendVerificationEmailRequestDTO): Promise<ResendVerificationEmailResponseDTO> {
     const { email } = dto;
+    const EMAIL_SECRET = process.env.EMAIL_SECRET || "emailSecret";
 
     // Find user by email
     const user = await this.userRepository.findByEmail(email);
@@ -24,7 +25,7 @@ export class ResendVerificationEmailUseCase {
     }
 
     // Generate new verification token
-    const token = randomBytes(32).toString('hex');
+    const token = jwt.sign({ email }, EMAIL_SECRET, { expiresIn: "1d" });;
     const tokenExpires = new Date();
     tokenExpires.setHours(tokenExpires.getHours() + 24); // Token expires in 24 hours
 

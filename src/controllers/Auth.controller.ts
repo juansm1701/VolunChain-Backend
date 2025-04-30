@@ -28,7 +28,11 @@ class AuthController {
   };
 
   verifyEmail = async (req: Request, res: Response): Promise<void> => {
-    const { token } = req.query;
+    const token = typeof req.params.token === 'string'
+    ? req.params.token
+    : typeof req.query.token === 'string'
+    ? req.query.token
+    : undefined;
 
     if (!token || typeof token !== 'string') {
       res.status(400).json({ message: "Token is required" });
