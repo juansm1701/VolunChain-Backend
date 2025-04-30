@@ -2,7 +2,7 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import {
   VolunteerAlreadyRegisteredError,
   VolunteerNotFoundError,
-  VolunteerPositionFullError
+  VolunteerPositionFullError,
 } from "../errors/VolunteerRegistrationError";
 
 export class UserVolunteerService {
@@ -75,57 +75,79 @@ export class UserVolunteerService {
     return { userVolunteers, total };
   }
 
-  async registerVolunteerSafely(userId: string, volunteerId: string) {
-    return this.prisma.$transaction(async (tx) => {
-      // Get the volunteer position with a lock
-      const volunteer = await tx.volunteer.findUnique({
-        where: { id: volunteerId },
-        include: {
-          _count: {
-            select: { userVolunteers: true }
-          }
-        }
-      });
+  private async validateVolunteerExists(
+    volunteerId: string,
+    tx: Prisma.TransactionClient
+  ) {
+    const volunteer = await tx.volunteer.findUnique({
+      where: { id: volunteerId },
+      include: {
+        _count: {
+          select: { userVolunteers: true },
+        },
+      },
+    });
 
-      if (!volunteer) {
-        throw new VolunteerNotFoundError();
-      }
+    if (!volunteer) {
+      throw new VolunteerNotFoundError();
+    }
 
-      // Check if user is already registered
-      const existingRegistration = await tx.userVolunteer.findUnique({
-        where: {
-          userId_volunteerId: {
-            userId,
-            volunteerId
-          }
-        }
-      });
+    return volunteer;
+  }
 
-      if (existingRegistration) {
-        throw new VolunteerAlreadyRegisteredError();
-      }
-
-      // Check if volunteer position is full
-      if (volunteer._count.userVolunteers >= volunteer.maxVolunteers) {
-        throw new VolunteerPositionFullError();
-      }
-
-      // Create the registration
-      const registration = await tx.userVolunteer.create({
-        data: {
+  private async validateNoDuplicateRegistration(
+    userId: string,
+    volunteerId: string,
+    tx: Prisma.TransactionClient
+  ) {
+    const existingRegistration = await tx.userVolunteer.findUnique({
+      where: {
+        userId_volunteerId: {
           userId,
           volunteerId,
         },
-        include: {
-          user: true,
-          volunteer: true,
-        },
-      });
-
-      return registration;
-    }, {
-      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-      timeout: 5000, // 5 second timeout
+      },
     });
+
+    if (existingRegistration) {
+      throw new VolunteerAlreadyRegisteredError();
+    }
+  }
+
+  private validateVolunteerCapacity(volunteer: {
+    _count: { userVolunteers: number };
+    maxVolunteers: number;
+  }) {
+    if (volunteer._count.userVolunteers >= volunteer.maxVolunteers) {
+      throw new VolunteerPositionFullError();
+    }
+  }
+
+  async registerVolunteerSafely(userId: string, volunteerId: string) {
+    return this.prisma.$transaction(
+      async (tx) => {
+        const volunteer = await this.validateVolunteerExists(volunteerId, tx);
+        await this.validateNoDuplicateRegistration(userId, volunteerId, tx);
+        this.validateVolunteerCapacity(volunteer);
+
+        // Create the registration
+        const registration = await tx.userVolunteer.create({
+          data: {
+            userId,
+            volunteerId,
+          },
+          include: {
+            user: true,
+            volunteer: true,
+          },
+        });
+
+        return registration;
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+        timeout: 5000, // 5 second timeout
+      }
+    );
   }
 }
