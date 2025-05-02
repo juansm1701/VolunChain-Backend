@@ -23,7 +23,7 @@ export async function generateCertificate({
   const page = pdfDoc.addPage([842, 595]);
 
   const logoBytes = fs.readFileSync(
-    path.join(__dirname, "../../assets/VolunChain.png")
+    path.join(__dirname, "../../../../assets/VolunChain.png")
   );
   const logoImage = await pdfDoc.embedPng(logoBytes);
 
