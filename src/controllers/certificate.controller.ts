@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { CertificateService } from "../services/CertificateService";
+import { container } from "../shared/infrastructure/container";
 import { prisma } from "../config/prisma";
+import { ICertificateService } from "../shared/domain/interfaces/ICertificateService";
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -9,6 +10,8 @@ interface AuthenticatedRequest extends Request {
     isVerified: boolean;
   };
 }
+
+const certificateService: ICertificateService = container.certificateService;
 
 export const downloadCertificate = async (
   req: AuthenticatedRequest,
@@ -30,12 +33,13 @@ export const downloadCertificate = async (
   try {
     if (req.query.direct === "true") {
       const pdfBuffer =
-        await CertificateService.getCertificateBuffer(volunteerId);
+        await certificateService.getCertificateBuffer(volunteerId);
+
       const cert = await prisma.certificate.findUnique({
         where: { volunteerId },
       });
 
-      await CertificateService.logDownload(cert!.id, userId);
+      await certificateService.logDownload(cert!.id, userId);
 
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
@@ -45,10 +49,7 @@ export const downloadCertificate = async (
 
       res.send(pdfBuffer);
       return;
-    }
-
-    // Redirect approach with pre-signed URL
-    else {
+    } else {
       const cert = await prisma.certificate.findUnique({
         where: { volunteerId },
       });
@@ -58,11 +59,10 @@ export const downloadCertificate = async (
         return;
       }
 
-      await CertificateService.logDownload(cert.id, userId);
+      await certificateService.logDownload(cert.id, userId);
 
-      // Get a pre-signed URL and redirect the user to it
       const presignedUrl =
-        await CertificateService.getCertificateUrl(volunteerId);
+        await certificateService.getCertificateUrl(volunteerId);
       return res.redirect(presignedUrl);
     }
   } catch (err) {
@@ -95,7 +95,7 @@ export const createCertificate = async (
   }
 
   try {
-    const uniqueId = await CertificateService.createCertificate(volunteerId, {
+    const uniqueId = await certificateService.createCertificate(volunteerId, {
       volunteerName: volunteer.name,
       projectName: volunteer.project.name,
       eventDate,
