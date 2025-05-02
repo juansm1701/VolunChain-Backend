@@ -10,8 +10,10 @@ import authRoutes from "./routes/authRoutes";
 import router from "./routes/nftRoutes";
 import userRoutes from "./routes/userRoutes";
 import { setupRateLimiting } from "./middleware/rateLimitMiddleware";
-
-
+import certificateRoutes from "./routes/certificatesRoutes";
+import volunteerRoutes from "./routes/VolunteerRoutes";
+import projectRoutes from "./routes/ProjectRoutes";
+import organizationRoutes from "./routes/OrganizationRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -112,7 +114,6 @@ app.use("/nft", router);
 
 app.use("/users", userRoutes);
 
-
 // Initialize the database and start the server
 prisma
   .$connect()
@@ -131,7 +132,7 @@ prisma
           }
         });
       })
-      .catch((error: any) => {
+      .catch((error) => {
         console.error(
           "Server failed to start due to Redis initialization error:",
           error
@@ -151,5 +152,10 @@ const initializeRedis = async () => {
     console.error("Error during Redis initialization:", error);
   }
 };
+
+app.use("/certificate", certificateRoutes);
+app.use("/projects", projectRoutes);
+app.use("/volunteers", volunteerRoutes);
+app.use("/organizations", organizationRoutes);
 
 export default app;

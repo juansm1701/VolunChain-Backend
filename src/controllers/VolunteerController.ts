@@ -8,17 +8,14 @@ export default class VolunteerController {
   async createVolunteer(req: Request, res: Response): Promise<void> {
     try {
       const volunteerData: CreateVolunteerDTO = req.body;
-      const volunteer = await this.volunteerService.createVolunteer(volunteerData);
+      const volunteer =
+        await this.volunteerService.createVolunteer(volunteerData);
       res.status(201).json(volunteer);
     } catch (error) {
-      res
-        .status(400)
-        .json({
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        });
+      res.status(400).json({
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
     }
   }
 
@@ -32,14 +29,10 @@ export default class VolunteerController {
       }
       res.status(200).json(volunteer);
     } catch (error) {
-      res
-        .status(400)
-        .json({
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        });
+      res.status(400).json({
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
     }
   }
 
@@ -50,14 +43,10 @@ export default class VolunteerController {
         await this.volunteerService.getVolunteersByProjectId(projectId);
       res.status(200).json(volunteers);
     } catch (error) {
-      res
-        .status(400)
-        .json({
-          error:
-            error instanceof Error
-              ? error.message
-              : "An unknown error occurred",
-        });
+      res.status(400).json({
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
     }
   }
 }
