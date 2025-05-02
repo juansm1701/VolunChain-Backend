@@ -19,6 +19,7 @@ model User {
   wallet    String @unique // Unique wallet identifier
   isVerified         Boolean  @default(false)
   verificationToken  String?
+  verificationTokenExpires  DateTime?
   nfts      NFT[]   @relation("UserNFTs") // One-to-many relationship with NFTs
   userVolunteers UserVolunteer[] @relation("UserToVolunteer") // Relation to UserVolunteer
 }
@@ -87,30 +88,34 @@ model TestItem {
 
 // UserVolunteer model represents the relationship between Users and Volunteers
 model UserVolunteer {
-  userId      String // Foreign key for User
-  volunteerId String // Foreign key for Volunteer
-  joinedAt    DateTime  @default(now()) // Timestamp for when the user joined as a volunteer
-  user        User      @relation(fields: [userId], references: [id], name: "UserToVolunteer")
+  id          String   @id @default(uuid())
+  userId      String
+  volunteerId String
+  joinedAt    DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], name: "UserToVolunteer")
   volunteer   Volunteer @relation(fields: [volunteerId], references: [id], name: "VolunteerToUser")
 
-  @@id([userId, volunteerId]) // Composite primary key
+  @@unique([userId, volunteerId])
+  @@index([userId])
+  @@index([volunteerId])
 }
 
 // Volunteer model represents a volunteer position within a project
 model Volunteer {
-  id             String          @id @default(uuid())
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  name           String          @db.VarChar(255)
-  description    String          @db.VarChar(255)
-  requirements   String          @db.VarChar(255)
-  incentive      String? // Optional field for incentives
-  projectId      String // Foreign key for Project
-  project        Project         @relation(fields: [projectId], references: [id])
-  userVolunteers UserVolunteer[] @relation("VolunteerToUser") // Relation to UserVolunteer
+  id              String          @id @default(uuid())
+  name            String
+  description     String
+  requirements    String
+  incentive       String?
+  maxVolunteers   Int             @default(10)
+  projectId       String
+  project         Project         @relation(fields: [projectId], references: [id])
+  userVolunteers  UserVolunteer[] @relation("VolunteerToUser")
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
   certificate    Certificate?
 
-  @@index([projectId]) // Index for quick lookup
+  @@index([projectId])
 }
 
 model diesel_schema_migrations {
