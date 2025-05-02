@@ -1,6 +1,6 @@
 import { Router } from "express";
 import OrganizationController from "../controllers/OrganizationController";
-import authMiddleware from "../middleware/authMiddleware";
+import auth from "../middleware/authMiddleware";
 
 const router = Router();
 
@@ -11,10 +11,14 @@ router.get("/:id", OrganizationController.getOrganizationById);
 router.get("/email/:email", OrganizationController.getOrganizationByEmail);
 
 // Protected routes
-router.put("/:id", authMiddleware, OrganizationController.updateOrganization);
+router.put(
+  "/:id",
+  auth.authMiddleware,
+  OrganizationController.updateOrganization
+);
 router.delete(
   "/:id",
-  authMiddleware,
+  auth.authMiddleware,
   OrganizationController.deleteOrganization
 );
 

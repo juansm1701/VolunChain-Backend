@@ -3,11 +3,11 @@ import {
   downloadCertificate,
   createCertificate,
 } from "../controllers/certificate.controller";
-import authMiddleware from "../middleware/authMiddleware";
+import auth from "../middleware/authMiddleware";
 
 const router = Router();
 
-router.get("/volunteers/:id", authMiddleware, downloadCertificate);
-router.post("/volunteers/:id", authMiddleware, createCertificate);
+router.get("/volunteers/:id", auth.authMiddleware, downloadCertificate);
+router.post("/volunteers/:id", auth.authMiddleware, createCertificate);
 
 export default router;
