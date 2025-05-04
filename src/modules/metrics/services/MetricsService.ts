@@ -1,4 +1,4 @@
-import { MetricsRepository } from '../repository/MetricsRepository';
+import { MetricsRepository } from '../repositories/MetricsRepository';
 import { ImpactMetrics, OrganizationImpactMetrics, ProjectImpactMetrics } from '../types/metrics';
 import { createClient } from 'redis';
 import dotenv from 'dotenv';

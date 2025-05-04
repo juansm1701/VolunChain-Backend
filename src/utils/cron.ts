@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import { MetricsService } from '../services/MetricsService';
+import { MetricsService } from '../modules/metrics/services/MetricsService';
 
 /**
  * Clase para gestionar tareas programadas mediante cron

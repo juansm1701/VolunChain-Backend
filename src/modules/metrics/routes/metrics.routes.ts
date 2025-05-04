@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { MetricsController } from '../controllers/MetricsController';
-import { optionalAuthMiddleware } from '../middlewares/auth.middleware';
-import { rateLimiterMiddleware } from '../middlewares/rateLimit.middleware';
+import { optionalAuthMiddleware } from '../../../middlewares/auth.middleware';
+import { rateLimiterMiddleware } from '../../../middlewares/rateLimit.middleware';
 
 const router = Router();
 const metricsController = new MetricsController();

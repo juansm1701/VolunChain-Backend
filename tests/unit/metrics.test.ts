@@ -1,9 +1,9 @@
-import { MetricsService } from '../../src/services/MetricsService';
-import { MetricsRepository } from '../../src/repository/MetricsRepository';
-import { ImpactMetrics, ProjectImpactMetrics } from '../../src/types/metrics';
+import { MetricsService } from '../../src/modules/metrics/services/MetricsService';
+import { MetricsRepository } from '../../src/modules/metrics/repositories/MetricsRepository';
+import { ImpactMetrics, ProjectImpactMetrics } from '../../src/modules/metrics/types/metrics';
 
 // Mock del repositorio de métricas
-jest.mock('../../src/repository/MetricsRepository');
+jest.mock('../../src/modules/metrics/repositories/MetricsRepository');
 
 describe('MetricsService', () => {
   let metricsService: MetricsService;
