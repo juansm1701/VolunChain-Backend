@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js" // Specifies the Prisma Client generator
+  provider      = "prisma-client-js" // Specifies the Prisma Client generator
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x", "darwin-arm64"] // Include necessary targets
 }
 
 datasource db {
@@ -9,19 +10,19 @@ datasource db {
 
 // User model represents a system user
 model User {
-  id        String @id @default(uuid()) // Unique identifier
-  createdAt DateTime @default(now()) // Timestamp for record creation
-  updatedAt DateTime @updatedAt // Timestamp for record update
-  name      String
-  lastName  String?
-  email     String @unique // Unique email constraint
-  password  String
-  wallet    String @unique // Unique wallet identifier
-  isVerified         Boolean  @default(false)
-  verificationToken  String?
-  verificationTokenExpires  DateTime?
-  nfts      NFT[]   @relation("UserNFTs") // One-to-many relationship with NFTs
-  userVolunteers UserVolunteer[] @relation("UserToVolunteer") // Relation to UserVolunteer
+  id                         String    @id @default(uuid()) // Unique identifier
+  createdAt                  DateTime  @default(now()) // Timestamp for record creation
+  updatedAt                  DateTime  @updatedAt // Timestamp for record update
+  name                       String
+  lastName                   String?
+  email                      String    @unique // Unique email constraint
+  password                   String
+  wallet                     String    @unique // Unique wallet identifier
+  isVerified                 Boolean   @default(false)
+  verificationToken          String?
+  verificationTokenExpires   DateTime?
+  nfts                       NFT[]     @relation("UserNFTs") // One-to-many relationship with NFTs
+  userVolunteers             UserVolunteer[] @relation("UserToVolunteer") // Relation to UserVolunteer
 }
 
 // Organization model represents an entity like a company or group
@@ -71,6 +72,7 @@ model Project {
   location       String       @db.VarChar(255)
   startDate      DateTime
   endDate        DateTime
+  status         String       @default("active") // Status can be: active, completed, archived
   organizationId String // Add this field
   organization   Organization @relation(fields: [organizationId], references: [id]) // Add this relation
   volunteers     Volunteer[]
@@ -88,16 +90,16 @@ model TestItem {
 
 // UserVolunteer model represents the relationship between Users and Volunteers
 model UserVolunteer {
-  id          String   @id @default(uuid())
-  userId      String
-  volunteerId String
-  joinedAt    DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], name: "UserToVolunteer")
-  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], name: "VolunteerToUser")
+  userId           String    // Foreign key for User
+  volunteerId      String    // Foreign key for Volunteer
+  joinedAt         DateTime  @default(now())
+  hoursContributed Float     @default(0) // Track hours contributed by the volunteer
+  user             User      @relation(fields: [userId], references: [id], name: "UserToVolunteer")
+  volunteer        Volunteer @relation(fields: [volunteerId], references: [id], name: "VolunteerToUser")
 
-  @@unique([userId, volunteerId])
-  @@index([userId])
-  @@index([volunteerId])
+  @@id([userId, volunteerId]) // Use composite ID from metrics branch
+  @@index([userId])           // Keep indexes from main
+  @@index([volunteerId])      // Keep indexes from main
 }
 
 // Volunteer model represents a volunteer position within a project
@@ -113,7 +115,7 @@ model Volunteer {
   userVolunteers  UserVolunteer[] @relation("VolunteerToUser")
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
-  certificate    Certificate?
+  certificate     Certificate?
 
   @@index([projectId])
 }
