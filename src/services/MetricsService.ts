@@ -1,6 +1,10 @@
 import { MetricsRepository } from '../repository/MetricsRepository';
 import { ImpactMetrics, OrganizationImpactMetrics, ProjectImpactMetrics } from '../types/metrics';
 import { createClient } from 'redis';
+import dotenv from 'dotenv';
+
+// Cargar variables de entorno
+dotenv.config();
 
 export class MetricsService {
   private metricsRepository: MetricsRepository;

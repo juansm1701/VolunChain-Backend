@@ -1,5 +1,28 @@
-import { PrismaClient, Project, UserVolunteer, Volunteer } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { ImpactMetrics, OrganizationImpactMetrics, ProjectImpactMetrics } from '../types/metrics';
+
+// Definir interfaces propias para los tipos necesarios
+interface Project {
+  id: string;
+  name: string;
+  status: string;
+  startDate: Date;
+  endDate: Date;
+}
+
+interface Volunteer {
+  id: string;
+}
+
+interface UserVolunteer {
+  userId: string;
+  volunteerId: string;
+  hoursContributed: number;
+  user: {
+    name: string;
+    lastName?: string | null;
+  };
+}
 
 export class MetricsRepository {
   private prisma: PrismaClient;
@@ -70,7 +93,7 @@ export class MetricsRepository {
       where: { organizationId }
     });
 
-    const projectIds = projects.map((project: Project) => project.id);
+    const projectIds = projects.map((project: any) => project.id);
 
     // Obtener voluntarios en estos proyectos
     const volunteers = await this.prisma.volunteer.findMany({
@@ -81,7 +104,7 @@ export class MetricsRepository {
       }
     });
 
-    const volunteerIds = volunteers.map((volunteer: Volunteer) => volunteer.id);
+    const volunteerIds = volunteers.map((volunteer: any) => volunteer.id);
 
     // Obtener relaciones UserVolunteer para estos voluntarios
     const userVolunteers = await this.prisma.userVolunteer.findMany({
@@ -94,7 +117,7 @@ export class MetricsRepository {
 
     // Calcular métricas
     const totalVolunteers = userVolunteers.length;
-    const totalHours = userVolunteers.reduce((sum: number, uv: UserVolunteer) => sum + uv.hoursContributed, 0);
+    const totalHours = userVolunteers.reduce((sum: number, uv: any) => sum + uv.hoursContributed, 0);
     const totalProjects = projects.length;
 
     // Contar proyectos por estado
@@ -104,7 +127,7 @@ export class MetricsRepository {
       archived: 0
     };
 
-    projects.forEach((project: Project) => {
+    projects.forEach((project: any) => {
       if (project.status === 'active' || project.status === 'completed' || project.status === 'archived') {
         statusCounts[project.status as keyof typeof statusCounts]++;
       }
@@ -139,7 +162,7 @@ export class MetricsRepository {
       where: { projectId }
     });
 
-    const volunteerIds = volunteers.map((volunteer: Volunteer) => volunteer.id);
+    const volunteerIds = volunteers.map((volunteer: any) => volunteer.id);
 
     // Obtener relaciones UserVolunteer para estos voluntarios
     const userVolunteers = await this.prisma.userVolunteer.findMany({
@@ -158,7 +181,7 @@ export class MetricsRepository {
     const totalHours = userVolunteers.reduce((sum: number, uv: any) => sum + uv.hoursContributed, 0);
 
     // Preparar desglose de voluntarios
-    const volunteerBreakdown = userVolunteers.map(uv => ({
+    const volunteerBreakdown = userVolunteers.map((uv: UserVolunteer) => ({
       userId: uv.userId,
       userName: `${uv.user.name} ${uv.user.lastName || ''}`.trim(),
       hoursContributed: uv.hoursContributed
