@@ -5,22 +5,32 @@ import { PrismaUserRepository } from '../modules/user/repositories/PrismaUserRep
 import { SendVerificationEmailUseCase } from '../modules/auth/use-cases/send-verification-email.usecase';
 import { VerifyEmailUseCase } from '../modules/auth/use-cases/verify-email.usecase';
 import { ResendVerificationEmailUseCase } from '../modules/auth/use-cases/resend-verification-email.usecase';
+import { WalletService } from '../modules/wallet/services/WalletService';
 
 class AuthService {
   private userRepository: PrismaUserRepository;
   private sendVerificationEmailUseCase: SendVerificationEmailUseCase;
   private verifyEmailUseCase: VerifyEmailUseCase;
   private resendVerificationEmailUseCase: ResendVerificationEmailUseCase;
+  private walletService: WalletService;
 
   constructor() {
     this.userRepository = new PrismaUserRepository();
     this.sendVerificationEmailUseCase = new SendVerificationEmailUseCase(this.userRepository);
     this.verifyEmailUseCase = new VerifyEmailUseCase(this.userRepository);
     this.resendVerificationEmailUseCase = new ResendVerificationEmailUseCase(this.userRepository);
+    this.walletService = new WalletService();
   }
 
   async authenticate(walletAddress: string): Promise<string> {
     const SECRET_KEY = process.env.JWT_SECRET || "defaultSecret";
+
+    // First verify the wallet address is valid
+    const isWalletValid = await this.walletService.isWalletValid(walletAddress);
+    if (!isWalletValid) {
+      throw new Error("Invalid wallet address");
+    }
+
     const user = await prisma.user.findUnique({
       where: { wallet: walletAddress },
     });
@@ -33,10 +43,24 @@ class AuthService {
   }
 
   async register(name: string, lastName: string, email: string, password: string, wallet: string) {
-    // Check if user already exists
+    // Verify wallet address first
+    const walletVerification = await this.walletService.verifyWallet(wallet);
+    if (!walletVerification.success || !walletVerification.isValid) {
+      throw new Error(`Wallet verification failed: ${walletVerification.message}`);
+    }
+
+    // Check if user already exists by email
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       throw new Error('User with this email already exists');
+    }
+
+    // Check if wallet is already registered
+    const existingWalletUser = await prisma.user.findUnique({
+      where: { wallet: wallet },
+    });
+    if (existingWalletUser) {
+      throw new Error('This wallet address is already registered');
     }
 
     // Hash password
@@ -61,6 +85,8 @@ class AuthService {
       id: user.id,
       name: user.name,
       email: user.email,
+      wallet: user.wallet,
+      walletVerified: walletVerification.accountExists,
       message: 'User registered successfully. Please check your email to verify your account.',
     };
   }
@@ -75,12 +101,20 @@ class AuthService {
 
   async checkVerificationStatus(userId: string) {
     const isVerified = await this.userRepository.isUserVerified(userId);
-    return { 
+    return {
       isVerified,
-      message: isVerified 
-        ? "Email is verified" 
+      message: isVerified
+        ? "Email is verified"
         : "Email is not verified"
     };
+  }
+
+  async verifyWalletAddress(walletAddress: string) {
+    return this.walletService.verifyWallet(walletAddress);
+  }
+
+  async validateWalletFormat(walletAddress: string) {
+    return this.walletService.validateWalletFormat(walletAddress);
   }
 }
 
