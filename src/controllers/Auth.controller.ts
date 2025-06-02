@@ -94,11 +94,47 @@ class AuthController {
       return;
     }
 
-    res.json({ 
-      message: `Hello ${req.user.role}`, 
+    res.json({
+      message: `Hello ${req.user.role}`,
       userId: req.user.id,
       isVerified: req.user.isVerified
     });
+  };
+
+  verifyWallet = async (req: Request, res: Response): Promise<void> => {
+    const { walletAddress } = req.body;
+
+    if (!walletAddress) {
+      res.status(400).json({ message: "Wallet address is required" });
+      return;
+    }
+
+    try {
+      const verification = await this.authService.verifyWalletAddress(walletAddress);
+      res.json(verification);
+    } catch (error) {
+      res.status(400).json({
+        message: error instanceof Error ? error.message : "Wallet verification failed"
+      });
+    }
+  };
+
+  validateWalletFormat = async (req: Request, res: Response): Promise<void> => {
+    const { walletAddress } = req.body;
+
+    if (!walletAddress) {
+      res.status(400).json({ message: "Wallet address is required" });
+      return;
+    }
+
+    try {
+      const validation = await this.authService.validateWalletFormat(walletAddress);
+      res.json(validation);
+    } catch (error) {
+      res.status(400).json({
+        message: error instanceof Error ? error.message : "Wallet format validation failed"
+      });
+    }
   };
 }
 
