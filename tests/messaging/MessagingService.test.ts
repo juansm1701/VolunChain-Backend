@@ -1,6 +1,6 @@
-import { MessagingService } from '../src/modules/messaging/services/MessagingService';
-import { IMessageRepository } from '../src/modules/messaging/repositories/interfaces/message-repository.interface';
-import { Message } from '../src/modules/messaging/domain/entities/message.entity';
+import { MessagingService } from '../../src/modules/messaging/services/MessagingService';
+import { IMessageRepository } from '../../src/modules/messaging/repositories/interfaces/message-repository.interface';
+import { Message } from '../../src/modules/messaging/domain/entities/message.entity';
 import { PrismaClient } from '@prisma/client';
 
 // Mock PrismaClient
