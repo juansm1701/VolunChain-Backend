@@ -1,22 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaUserRepository } from "../modules/user/repositories/PrismaUserRepository";
+import { AuthenticatedRequest, DecodedUser, toAuthenticatedUser } from "../types/auth.types";
 
-interface DecodedUser {
-  id: string;
-  role: string;
-  isVerified: boolean;
-  email: string;
-  [key: string]: string | boolean;
-}
 
-declare module "express" {
-  interface Request {
-    user?: DecodedUser;
-  }
-}
-
-export type AuthenticatedRequest = Request & { user?: DecodedUser };
 
 const SECRET_KEY = process.env.JWT_SECRET || "defaultSecret";
 const userRepository = new PrismaUserRepository();
@@ -54,9 +41,9 @@ export const authMiddleware = async (
 
     (req as AuthenticatedRequest).user = {
       id: user.id,
+      email: user.email,
       role: decoded.role,
       isVerified: user.isVerified,
-      email: user.email,
     };
 
     next();
@@ -96,10 +83,16 @@ export const requireVerifiedEmail = async (
     authenticatedReq.user.isVerified = true;
     next();
   } catch (error) {
-    console.error("Error checking email verification status:", error);
-    res.status(500).json({ message: "Internal server error" });
+    // Use basic console.error here to avoid circular dependencies
+    console.error('Error checking email verification status:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      ...(req.traceId && { traceId: req.traceId })
+    });
   }
 };
 
-export { authMiddleware, requireVerifiedEmail };
-export default authMiddleware;
+export default {
+  requireVerifiedEmail,
+  authMiddleware
+};
