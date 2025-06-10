@@ -17,6 +17,7 @@ import certificateRoutes from "./routes/certificatesRoutes";
 import volunteerRoutes from "./routes/VolunteerRoutes";
 import projectRoutes from "./routes/ProjectRoutes";
 import organizationRoutes from "./routes/OrganizationRoutes";
+import messageRoutes from './modules/messaging/routes/messaging.routes';
 import testRoutes from "./routes/testRoutes";
 
 const app = express();
@@ -136,6 +137,7 @@ app.use("/certificate", certificateRoutes);
 app.use("/projects", projectRoutes);
 app.use("/volunteers", volunteerRoutes);
 app.use("/organizations", organizationRoutes);
+router.use("/messages", messageRoutes);
 
 // Test routes
 app.use("/test", testRoutes);

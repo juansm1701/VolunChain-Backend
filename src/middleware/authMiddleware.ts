@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-// import { AppDataSource } from "../config/data-source";
-// import { UserRepository } from "../repository/user.repository";
 import { PrismaUserRepository } from "../modules/user/repositories/PrismaUserRepository";
 
 interface DecodedUser {
@@ -103,3 +101,6 @@ export const requireVerifiedEmail = async (
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export { authMiddleware, requireVerifiedEmail };
+export default authMiddleware;
