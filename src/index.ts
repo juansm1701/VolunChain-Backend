@@ -7,12 +7,13 @@ import { redisClient } from "./config/redis";
 import cors from "cors";
 import { errorHandler } from "./middlewares/errorHandler";
 import { dbPerformanceMiddleware } from "./middlewares/dbPerformanceMiddleware";
+import { setupRateLimiting } from "./middleware/rateLimitMiddleware";
+import { cronManager } from "./utils/cron";
+import apiRouter from "./routes";
 import authRoutes from "./routes/authRoutes";
 import router from "./routes/nftRoutes";
 import userRoutes from "./routes/userRoutes";
 import metricsRoutes from "./modules/metrics/routes/metrics.routes";
-import { setupRateLimiting } from "./middleware/rateLimitMiddleware";
-import { cronManager } from "./utils/cron";
 import certificateRoutes from "./routes/certificatesRoutes";
 import volunteerRoutes from "./routes/VolunteerRoutes";
 import projectRoutes from "./routes/ProjectRoutes";
@@ -32,7 +33,7 @@ app.use(express.json());
 // Database performance monitoring
 app.use(dbPerformanceMiddleware);
 
-//Rate limiting
+// Rate limiting
 setupRateLimiting(app);
 
 app.use(cors());
@@ -121,12 +122,16 @@ app.get("/health", async (req, res) => {
   res.status(httpStatus).json(healthStatus);
 });
 
+// API Routes with versioning
+app.use("/api", apiRouter);
+
 // Authentication routes
 app.use("/auth", authRoutes);
 
-// This is for NFT
+// NFT routes
 app.use("/nft", router);
 
+// User routes
 app.use("/users", userRoutes);
 
 // Metrics routes
@@ -151,7 +156,7 @@ prisma
     // initialize Redis
     initializeRedis()
       .then(() => {
-        // Inicializar tareas programadas
+        // Initialize scheduled tasks
         cronManager.initCronJobs();
 
         app.listen(PORT, () => {

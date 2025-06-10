@@ -5,6 +5,8 @@ import jwt from "jsonwebtoken";
 interface DecodedUser {
   id: string;
   email: string;
+  role?: string;
+  isVerified?: boolean;
   [key: string]: unknown;
 }
 
@@ -18,6 +20,7 @@ declare module "express" {
 /**
  * Middleware que permite el acceso a la ruta incluso si el usuario no está autenticado,
  * pero si proporciona un token válido, los detalles del usuario se adjuntan a la solicitud.
+ * Combina lo mejor de ambas implementaciones con mejor tipado y manejo de errores.
  */
 export const optionalAuthMiddleware = (
   req: Request,
@@ -47,7 +50,12 @@ export const optionalAuthMiddleware = (
     const decoded = jwt.verify(token, secret) as DecodedUser;
 
     // Adjuntar información del usuario decodificada a la solicitud
-    req.user = decoded;
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      ...(decoded.role && { role: decoded.role }),
+      ...(decoded.isVerified && { isVerified: decoded.isVerified }),
+    };
   } catch (error) {
     // Error al verificar el token, continuar como invitado
     console.error("Token verification failed:", error);
@@ -56,3 +64,5 @@ export const optionalAuthMiddleware = (
   // Siempre continuar, ya sea autenticado o como invitado
   next();
 };
+
+export default optionalAuthMiddleware;

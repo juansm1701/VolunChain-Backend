@@ -16,10 +16,9 @@ declare module "express" {
   }
 }
 
-export type AuthenticatedRequest = Request;
+export type AuthenticatedRequest = Request & { user?: DecodedUser };
 
 const SECRET_KEY = process.env.JWT_SECRET || "defaultSecret";
-
 const userRepository = new PrismaUserRepository();
 
 export const authMiddleware = async (
