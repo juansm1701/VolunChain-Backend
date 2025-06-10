@@ -1,11 +1,12 @@
 import "dotenv/config";
 import "reflect-metadata";
 import express from "express";
-import { prisma } from "./config/prisma";
+import { prisma, dbMonitor } from "./config/prisma";
 import { SwaggerConfig } from "./config/swagger.config";
 import { redisClient } from "./config/redis";
 import cors from "cors";
 import { errorHandler } from "./middlewares/errorHandler";
+import { dbPerformanceMiddleware } from "./middlewares/dbPerformanceMiddleware";
 import authRoutes from "./routes/authRoutes";
 import router from "./routes/nftRoutes";
 import userRoutes from "./routes/userRoutes";
@@ -17,6 +18,7 @@ import volunteerRoutes from "./routes/VolunteerRoutes";
 import projectRoutes from "./routes/ProjectRoutes";
 import organizationRoutes from "./routes/OrganizationRoutes";
 import messageRoutes from './modules/messaging/routes/messaging.routes';
+import testRoutes from "./routes/testRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +28,9 @@ console.info("Starting VolunChain API...");
 
 // Middleware for parsing JSON requests
 app.use(express.json());
+
+// Database performance monitoring
+app.use(dbPerformanceMiddleware);
 
 //Rate limiting
 setupRateLimiting(app);
@@ -59,6 +64,10 @@ app.get("/health", async (req, res) => {
   type ServiceStatus = {
     status: string;
     responseTime?: string;
+    metrics?: {
+      averageQueryTime?: number;
+      activeConnections?: number;
+    };
   };
 
   type HealthStatus = {
@@ -80,6 +89,9 @@ app.get("/health", async (req, res) => {
     healthStatus.services.database = {
       status: "connected",
       responseTime: `${response_time}ms`,
+      metrics: {
+        averageQueryTime: dbMonitor.getAverageQueryTime(),
+      },
     };
   } catch (err) {
     healthStatus.status = "unhealthy";
@@ -127,6 +139,9 @@ app.use("/volunteers", volunteerRoutes);
 app.use("/organizations", organizationRoutes);
 router.use("/messages", messageRoutes);
 
+// Test routes
+app.use("/test", testRoutes);
+
 // Initialize the database and start the server
 prisma
   .$connect()
@@ -138,7 +153,7 @@ prisma
       .then(() => {
         // Inicializar tareas programadas
         cronManager.initCronJobs();
-        
+
         app.listen(PORT, () => {
           console.log(`Server is running on http://localhost:${PORT}`);
           if (ENV === "development") {
