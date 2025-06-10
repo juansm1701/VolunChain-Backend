@@ -1,21 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-
-// Definir interfaz para la información del usuario decodificada
-interface DecodedUser {
-  id: string;
-  email: string;
-  role?: string;
-  isVerified?: boolean;
-  [key: string]: unknown;
-}
-
-// Extender la interfaz Request para incluir el campo user
-declare module "express" {
-  interface Request {
-    user?: DecodedUser;
-  }
-}
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { DecodedUser, AuthenticatedUser, toAuthenticatedUser } from '../types/auth.types';
 
 /**
  * Middleware que permite el acceso a la ruta incluso si el usuario no está autenticado,
@@ -49,16 +34,12 @@ export const optionalAuthMiddleware = (
     const secret = process.env.JWT_SECRET || "default_secret";
     const decoded = jwt.verify(token, secret) as DecodedUser;
 
-    // Adjuntar información del usuario decodificada a la solicitud
-    req.user = {
-      id: decoded.id,
-      email: decoded.email,
-      ...(decoded.role && { role: decoded.role }),
-      ...(decoded.isVerified && { isVerified: decoded.isVerified }),
-    };
+    // Convertir DecodedUser a AuthenticatedUser y adjuntar a la solicitud
+    req.user = toAuthenticatedUser(decoded);
   } catch (error) {
     // Error al verificar el token, continuar como invitado
-    console.error("Token verification failed:", error);
+    // Note: We don't import logger here to avoid circular dependencies
+    // This is optional auth middleware, so we continue silently
   }
 
   // Siempre continuar, ya sea autenticado o como invitado

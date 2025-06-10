@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { CustomError, InternalServerError } from "../errors";
+import { createLogger } from "../services/logger.service";
+
+const logger = createLogger('ERROR_HANDLER');
 
 interface ErrorLogInfo {
   timestamp: string;
@@ -32,12 +35,27 @@ export const errorHandler = (
     errorInfo.requestQuery = req.query;
   }
 
-  // Log the error (you might want to use a proper logger in production)
-  console.error(JSON.stringify(errorInfo, null, 2));
+  // Log error with Winston including trace ID and context
+  logger.error(
+    'Unhandled error occurred',
+    err,
+    req,
+    {
+      path: req.path,
+      method: req.method,
+      timestamp: new Date().toISOString(),
+      errorType: err.constructor.name
+    }
+  );
 
   // Handle different types of errors
   if (err instanceof CustomError) {
-    return res.status(err.statusCode).json(err.toJSON());
+    return res.status(err.statusCode).json({
+      code: err.code,
+      message: err.message,
+      ...(err.details && { details: err.details }),
+      ...(req.traceId && { traceId: req.traceId })
+    });
   }
 
   // For unknown errors, convert to InternalServerError
@@ -45,5 +63,8 @@ export const errorHandler = (
     err.message || "An unexpected error occurred"
   );
 
-  return res.status(internalError.statusCode).json(internalError.toJSON());
+  return res.status(internalError.statusCode).json({
+    ...internalError.toJSON(),
+    ...(req.traceId && { traceId: req.traceId })
+  });
 };

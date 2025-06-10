@@ -2,24 +2,41 @@ import { Request } from 'express';
 
 /**
  * Unified Authentication Types
- * 
+ *
  * This file consolidates all authentication-related type definitions
  * to prevent conflicts and ensure consistency across the application.
  */
 
-// Base user interface from JWT token
-export interface DecodedUser {
-  id: string;
+/**
+ * Unified user interface for authentication
+ * This interface combines all user properties needed across the application
+ */
+export interface AuthenticatedUser {
+  id: string | number;
   email: string;
   role: string;
   isVerified: boolean;
-  iat?: number;
-  exp?: number;
 }
 
-// Extended user interface with additional properties (alias for backward compatibility)
-export interface AuthenticatedUser extends DecodedUser {
-  // This is now the same as DecodedUser for consistency
+/**
+ * Unified authenticated request interface
+ * Extends Express Request with user and traceId properties
+ */
+export interface AuthenticatedRequest extends Request {
+  user?: AuthenticatedUser;
+  traceId?: string;
+}
+
+/**
+ * Decoded JWT user interface (from auth middleware)
+ */
+export interface DecodedUser {
+  id: string | number;
+  email: string;
+  role?: string;
+  isVerified?: boolean;
+  iat?: number;
+  exp?: number;
 }
 
 // Legacy user interface for backward compatibility
@@ -30,22 +47,33 @@ export interface LegacyUser {
   email?: string;
 }
 
-// Request interface with authenticated user
-export interface AuthenticatedRequest extends Request {
-  user?: DecodedUser;
+/**
+ * Type guard to check if user has required authentication properties
+ */
+export function isAuthenticatedUser(user: any): user is AuthenticatedUser {
+  return user &&
+         (typeof user.id === 'string' || typeof user.id === 'number') &&
+         typeof user.email === 'string' &&
+         typeof user.role === 'string' &&
+         typeof user.isVerified === 'boolean';
 }
 
-// Type conversion utilities
-export const toAuthenticatedUser = (user: Partial<DecodedUser>): DecodedUser => ({
-  id: user.id || '',
-  email: user.email || '',
-  role: user.role || 'user',
-  isVerified: user.isVerified || false,
-  iat: user.iat,
-  exp: user.exp
-});
+/**
+ * Helper function to convert DecodedUser to AuthenticatedUser
+ */
+export function toAuthenticatedUser(decodedUser: DecodedUser): AuthenticatedUser {
+  return {
+    id: decodedUser.id,
+    email: decodedUser.email,
+    role: decodedUser.role || 'user',
+    isVerified: decodedUser.isVerified || false
+  };
+}
 
-export const toLegacyUser = (user: DecodedUser): LegacyUser => ({
+/**
+ * Helper function to convert AuthenticatedUser to LegacyUser for backward compatibility
+ */
+export const toLegacyUser = (user: AuthenticatedUser): LegacyUser => ({
   id: user.id,
   role: user.role,
   isVerified: user.isVerified,
@@ -56,7 +84,8 @@ export const toLegacyUser = (user: DecodedUser): LegacyUser => ({
 declare global {
   namespace Express {
     interface Request {
-      user?: DecodedUser;
+      user?: AuthenticatedUser;
+      traceId?: string;
     }
   }
 }
