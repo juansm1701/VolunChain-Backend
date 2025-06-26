@@ -14,14 +14,14 @@ class ProjectController {
         endDate,
         organizationId,
       } = req.body;
-      const project = await this.projectService.createProject(
+      const project = await this.projectService.createProject({
         name,
         description,
         location,
-        new Date(startDate),
-        new Date(endDate),
-        organizationId
-      );
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        organizationId,
+      });
       res.status(201).json(project);
     } catch (error) {
       res.status(400).json({

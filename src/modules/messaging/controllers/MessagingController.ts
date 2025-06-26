@@ -1,13 +1,14 @@
-import { Request, Response } from 'express';
-import { MessagingService } from '../services/MessagingService';
-import { SendMessageDto, MessageResponseDto } from '../dto/message.dto';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
+import { Response } from "express";
+import { MessagingService } from "../services/MessagingService";
+import { SendMessageDto, MessageResponseDto } from "../dto/message.dto";
+import { validate } from "class-validator";
+import { plainToClass } from "class-transformer";
+import { AuthenticatedRequest } from "../../../types/auth.types";
 
 export class MessagingController {
   constructor(private messagingService: MessagingService) {}
 
-  async sendMessage(req: Request, res: Response): Promise<void> {
+  async sendMessage(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const sendMessageDto = plainToClass(SendMessageDto, req.body);
       const errors = await validate(sendMessageDto);
@@ -15,11 +16,11 @@ export class MessagingController {
       if (errors.length > 0) {
         res.status(400).json({
           success: false,
-          message: 'Validation failed',
-          errors: errors.map(error => ({
+          message: "Validation failed",
+          errors: errors.map((error) => ({
             field: error.property,
-            constraints: error.constraints
-          }))
+            constraints: error.constraints,
+          })),
         });
         return;
       }
@@ -28,14 +29,14 @@ export class MessagingController {
       if (!senderId) {
         res.status(401).json({
           success: false,
-          message: 'User not authenticated'
+          message: "User not authenticated",
         });
         return;
       }
 
       const message = await this.messagingService.sendMessage(
         sendMessageDto.content,
-        senderId,
+        String(senderId),
         sendMessageDto.receiverId,
         sendMessageDto.volunteerId
       );
@@ -52,18 +53,22 @@ export class MessagingController {
 
       res.status(201).json({
         success: true,
-        message: 'Message sent successfully',
-        data: response
+        message: "Message sent successfully",
+        data: response,
       });
     } catch (error) {
       res.status(400).json({
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to send message'
+        message:
+          error instanceof Error ? error.message : "Failed to send message",
       });
     }
   }
 
-  async getConversation(req: Request, res: Response): Promise<void> {
+  async getConversation(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
     try {
       const { volunteerId } = req.params;
       const page = parseInt(req.query.page as string) || 1;
@@ -73,7 +78,7 @@ export class MessagingController {
       if (!userId) {
         res.status(401).json({
           success: false,
-          message: 'User not authenticated'
+          message: "User not authenticated",
         });
         return;
       }
@@ -81,37 +86,40 @@ export class MessagingController {
       if (!volunteerId) {
         res.status(400).json({
           success: false,
-          message: 'Volunteer ID is required'
+          message: "Volunteer ID is required",
         });
         return;
       }
 
       const messages = await this.messagingService.getConversation(
         volunteerId,
-        userId,
+        String(userId),
         page,
         limit
       );
 
       res.status(200).json({
         success: true,
-        message: 'Conversation retrieved successfully',
+        message: "Conversation retrieved successfully",
         data: messages,
         pagination: {
           page,
           limit,
-          total: messages.length
-        }
+          total: messages.length,
+        },
       });
     } catch (error) {
       res.status(400).json({
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to retrieve conversation'
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to retrieve conversation",
       });
     }
   }
 
-  async markAsRead(req: Request, res: Response): Promise<void> {
+  async markAsRead(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { id: messageId } = req.params;
 
@@ -119,7 +127,7 @@ export class MessagingController {
       if (!userId) {
         res.status(401).json({
           success: false,
-          message: 'User not authenticated'
+          message: "User not authenticated",
         });
         return;
       }
@@ -127,25 +135,31 @@ export class MessagingController {
       if (!messageId) {
         res.status(400).json({
           success: false,
-          message: 'Message ID is required'
+          message: "Message ID is required",
         });
         return;
       }
 
-      const message = await this.messagingService.markMessageAsRead(messageId, userId);
+      const message = await this.messagingService.markMessageAsRead(
+        messageId,
+        String(userId)
+      );
 
       res.status(200).json({
         success: true,
-        message: 'Message marked as read',
+        message: "Message marked as read",
         data: {
           id: message.id,
-          readAt: message.readAt
-        }
+          readAt: message.readAt,
+        },
       });
     } catch (error) {
       res.status(400).json({
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to mark message as read'
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to mark message as read",
       });
     }
   }
