@@ -1,131 +1,288 @@
-# Testing with SQLite
+# Contributing to VolunChain
 
-This project supports PostgreSQL (for production) and SQLite (for testing). This guide explains how to set up and use SQLite as an alternative database for testing, allowing developers to run tests without requiring a full PostgreSQL instance, simplifying the setup process for contributors.
+## 🏗️ Architecture Overview
 
-## 🛠️ Database Configuration
+VolunChain follows **Domain-Driven Design (DDD)** principles with a strict modular architecture. Every piece of code must be organized within its appropriate domain module.
 
-The application supports two database types configured via the `DB_TYPE` environment variable:
+## 📁 Module Structure
 
-- `postgres` for PostgreSQL (default)
-- `sqlite` for SQLite (testing)
+Every module in `src/modules/<domain>/` must follow this structure:
 
-### ⚙️ Environment Setup
-
-During testing, change the DB_TYPE environment variable from `postgres` to `sqlite`. This will reconfigure the Prisma AppDataSource object to use SQLite and setup a transient, lightweight database for running tests.
-
-### Steps
-
-1. Follow the instructions in the respository [README.md](./readme.md) file to clone the repository, start Docker, and create your contribution branch.
-
-2. Ensure all dependencies are installed by running this command:
-
-    ```bash
-    npm install
-    ```
-
-3. **For Testing**: Create a new `.env.test` file in the project's root directory and add this variable:
-
-    ```env
-    DB_TYPE=sqlite
-    ```
-
-4. **For Development**: Edit the `.env` file in the root folder of the directory to confirm full functionality of your PostgreSQL database before pushing to production:
-
-    ```env
-    DB_TYPE=postgres
-    DB_HOST=localhost
-    DB_PORT=5432
-    DB_USER=volunchain
-    DB_PASSWORD=volunchain123
-    DB_NAME=volunchain
-    ```
-
-## 🏃‍♂️Running Tests
-
-### Quick Start
-
-After writing test scripts in the `tests` folder, run them using SQLite with the  command: `npm test` or `npm run test` or `npm run test:sqlite`.
-
-### Benefits of SQLite Testing
-
-- No additional database setup required
-- Uses an in-memory database (`:memory:`), ensuring fast execution
-- Ideal for CI/CD pipelines
-
-### Benefits of using .env.test
-
-- Isolation: Test configurations don’t interfere with development or production.
-- Reproducibility: Ensures tests run with the same configuration every time.
-- Security: Avoids using production credentials in tests.
-- Flexibility: Easily switch between environments by loading the appropriate .env file.
-
-## 🎖️ Database Migrations
-
-Migrations should be database-agnostic to support both PostgreSQL and SQLite.
-
-### Example Migration
-
-#### Before (Using Postgres raw SQL)
-
-```typescript
-await queryRunner.query(`ALTER TABLE "user" ADD COLUMN "age" INTEGER`);
+```
+src/modules/<domain>/
+├── __tests__/                    # All tests for this module
+│   ├── unit/                     # Unit tests
+│   ├── integration/              # Integration tests
+│   └── e2e/                      # End-to-end tests
+├── domain/                       # Domain layer (business logic)
+│   ├── entities/                 # Domain entities
+│   ├── value-objects/            # Value objects
+│   ├── interfaces/               # Domain interfaces
+│   └── exceptions/               # Domain-specific exceptions
+├── application/                  # Application layer (use cases & services)
+│   ├── services/                 # Application services
+│   ├── use-cases/                # Business use cases
+│   └── interfaces/               # Application interfaces
+├── infrastructure/               # Infrastructure layer
+│   ├── repositories/             # Repository implementations
+│   ├── services/                 # External service implementations
+│   └── adapters/                 # External system adapters
+├── presentation/                 # Presentation layer
+│   ├── controllers/              # HTTP controllers
+│   ├── routes/                   # Express routes
+│   ├── middlewares/              # Module-specific middlewares
+│   └── dto/                      # Data Transfer Objects
+└── README.md                     # Module documentation
 ```
 
-#### After (Using Prisma API)
+## 🎯 Coding Standards
+
+### Naming Conventions
+
+- **Classes**: PascalCase (e.g., `UserService`, `CreateUserUseCase`)
+- **Functions/Methods**: camelCase (e.g., `createUser`, `validateEmail`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_RETRY_ATTEMPTS`)
+- **Files**: kebab-case (e.g., `user-service.ts`, `create-user.usecase.ts`)
+- **DTOs**: PascalCase with "Dto" suffix (e.g., `CreateUserDto`, `UserResponseDto`)
+
+### Code Organization Rules
+
+1. **Domain Logic**: Must live in `domain/` - no business logic in controllers or services
+2. **Use Cases**: All business operations must be use cases in `application/use-cases/`
+3. **Services**: Application services in `application/services/`, infrastructure services in `infrastructure/services/`
+4. **Controllers**: Only handle HTTP concerns, delegate to use cases
+5. **DTOs**: All API contracts must be DTOs with validation decorators
+
+### Validation & DTOs
+
+All DTOs must use `class-validator` decorators:
 
 ```typescript
-import { TableColumn } from "Prisma";
+import { IsString, IsEmail, IsOptional, MinLength } from "class-validator";
 
-await queryRunner.addColumn(
-  "user",
-  new TableColumn({ name: "age", type: "integer" })
-);
+export class CreateUserDto {
+  @IsString()
+  @MinLength(2)
+  firstName: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsOptional()
+  @IsString()
+  bio?: string;
+}
 ```
 
-## 🔧 Troubleshooting
+### Testing Requirements
 
-### Common Issues & Fixes
+- **Unit Tests**: Test individual functions/classes in isolation
+- **Integration Tests**: Test module interactions
+- **E2E Tests**: Test complete user workflows
+- **Coverage**: Minimum 80% code coverage per module
+- **Test Files**: Must be in `__tests__/` directory within each module
 
-1. **SQLite Permission Issues**
-   - Ensure write permissions in the project directory
-   - Verify `node_modules` is installed
-   - Check if `sqlite3` package is installed:
+### Database & Migrations
 
-     ```bash
-     npm install sqlite3 --save-dev
-     ```
+- Use Prisma for all database operations
+- Migrations must be database-agnostic (support both PostgreSQL and SQLite)
+- Repository pattern for data access
+- No raw SQL in business logic
 
-2. **PostgreSQL Connection Issues**
-   - Ensure PostgreSQL service is running
-   - Verify database credentials in `.env` file
-   - Check if the database exists or create a new one in the `psql` shell
+## 🚀 Development Workflow
 
-3. **Database Inconsistencies**
+### 1. Environment Setup
 
-   - Ensure migrations do not use raw SQL specific to PostgreSQL
-   - Use Prisma’s schema API for compatibility across databases
-   - Verify that table constraints are supported in SQLite
+```bash
+# Install dependencies
+npm install
 
-## 📝 Notes
+# Set up environment
+cp .env.example .env
+# Edit .env with your configuration
 
-- Migrations: All migrations must use Prisma’s schema API (e.g., queryRunner.createTable) instead of raw SQL to ensure compatibility with SQLite.
+# For testing
+cp .env.example .env.test
+# Set DB_TYPE=sqlite in .env.test
+```
 
-- In-Memory Database: SQLite uses an in-memory database (:memory:) during tests, so no additional setup is required.
+### 2. Database Setup
 
-- PostgreSQL-Specific Features: Avoid using PostgreSQL-specific features (e.g., `jsonb`, `uuid`) in migrations or queries if you plan to support SQLite.
+```bash
+# Development (PostgreSQL)
+docker-compose up -d
+npm run db:migrate
+npm run db:seed
 
-### Development Best Practices
+# Testing (SQLite)
+npm run test:setup
+```
 
-- Write tests for both SQLite and PostgreSQL
-- Keep migrations database-agnostic using Prisma’s schema API
-- Test both configurations before submitting pull requests
+### 3. Development Commands
 
-### Need Help?
+```bash
+# Start development server
+npm run dev
 
-If you encounter issues:
+# Run tests
+npm test                    # All tests
+npm run test:unit          # Unit tests only
+npm run test:integration   # Integration tests only
+npm run test:e2e          # E2E tests only
 
-1. Check error messages for hints
-2. Verify environment variables are set correctly
-3. Ensure dependencies are installed
-4. Check official documentation
-5. Open an issue with detailed steps to reproduce the problem
+# Code quality
+npm run lint              # ESLint
+npm run format            # Prettier
+npm run type-check        # TypeScript check
+```
+
+### 4. Pre-commit Hooks
+
+The project uses pre-commit hooks that automatically:
+
+- Run ESLint for code style
+- Run Prettier for formatting
+- Run TypeScript type checking
+- Run affected tests
+
+**Bypass for urgent fixes only:**
+
+```bash
+git commit -m "urgent fix" --no-verify
+```
+
+## 📝 Module Development Guidelines
+
+### Creating a New Module
+
+1. Create the module directory structure
+2. Implement domain entities and value objects
+3. Define repository interfaces
+4. Implement use cases
+5. Create application services
+6. Add controllers and routes
+7. Write comprehensive tests
+8. Create module README.md
+
+### Module README Template
+
+Every module must include a README.md with:
+
+````markdown
+# <Module Name>
+
+## Overview
+
+Brief description of the module's purpose and responsibilities.
+
+## Architecture
+
+- Domain entities and business rules
+- Use cases and application logic
+- Infrastructure concerns
+- API endpoints
+
+## Development
+
+### Adding New Features
+
+1. Create/update domain entities
+2. Implement use cases
+3. Add controllers and routes
+4. Write tests
+5. Update documentation
+
+### Testing
+
+```bash
+npm test -- --testPathPattern=modules/<module-name>
+```
+````
+
+### API Endpoints
+
+List of available endpoints with examples.
+
+## Dependencies
+
+List of other modules this module depends on.
+
+```
+
+## 🔧 Code Quality Standards
+
+### TypeScript
+
+- Strict mode enabled
+- No `any` types without explicit justification
+- Proper interface definitions
+- Generic types where appropriate
+
+### Error Handling
+
+- Use domain exceptions for business logic errors
+- Proper HTTP status codes in controllers
+- Consistent error response format
+- Logging for debugging
+
+### Performance
+
+- Database queries optimized
+- Proper indexing
+- Caching where appropriate
+- Rate limiting on public endpoints
+
+### Security
+
+- Input validation on all endpoints
+- Authentication/authorization checks
+- SQL injection prevention (use Prisma)
+- Rate limiting
+- CORS configuration
+
+## 🐛 Bug Reports & Feature Requests
+
+### Bug Reports
+
+Include:
+- Clear description of the issue
+- Steps to reproduce
+- Expected vs actual behavior
+- Environment details
+- Error logs
+
+### Feature Requests
+
+Include:
+- Problem description
+- Proposed solution
+- Use cases
+- Impact assessment
+
+## 📋 Pull Request Guidelines
+
+1. **Branch Naming**: `feature/description` or `fix/description`
+2. **Commit Messages**: Conventional commits format
+3. **Tests**: All new code must have tests
+4. **Documentation**: Update README files as needed
+5. **Code Review**: All PRs require review
+
+### PR Checklist
+
+- [ ] Code follows style guidelines
+- [ ] Tests pass and coverage is adequate
+- [ ] Documentation updated
+- [ ] No breaking changes (or documented)
+- [ ] Security considerations addressed
+
+## 🎯 Getting Help
+
+- Check existing documentation
+- Search existing issues
+- Create detailed issue reports
+- Join our community discussions
+
+---
+
+**Remember**: This is production software. Every line of code affects real users. Write it like your career depends on it.
+```
