@@ -89,35 +89,40 @@ src/modules/<domain>/
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - Docker & Docker Compose
 - Git
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-repo/volunchain-backend.git
    cd volunchain-backend
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Environment setup**
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 4. **Start database**
+
    ```bash
    docker-compose up -d
    ```
 
 5. **Run migrations**
+
    ```bash
    npm run db:migrate
    npm run db:seed
@@ -207,6 +212,7 @@ npm run quality
 ### Pre-commit Hooks
 
 The project uses pre-commit hooks that automatically:
+
 - Run ESLint for code style
 - Run Prettier for formatting
 - Run TypeScript type checking
@@ -234,22 +240,23 @@ npm run db:seed
 
 ### Core Modules
 
-| Module | Purpose | Key Features |
-|--------|---------|--------------|
-| **auth** | Authentication & authorization | JWT, email verification, password reset |
-| **user** | User management | Profile, preferences, settings |
-| **volunteer** | Volunteer operations | Registration, skills, availability |
-| **project** | Project management | Creation, updates, status tracking |
-| **organization** | Organization operations | Management, verification, settings |
-| **nft** | NFT operations | Minting, transfers, metadata |
-| **messaging** | Communication | Real-time messaging, notifications |
-| **metrics** | Analytics | Usage statistics, reporting |
-| **photo** | Media management | Upload, storage, optimization |
-| **wallet** | Blockchain wallet | Stellar integration, verification |
+| Module           | Purpose                        | Key Features                            |
+| ---------------- | ------------------------------ | --------------------------------------- |
+| **auth**         | Authentication & authorization | JWT, email verification, password reset |
+| **user**         | User management                | Profile, preferences, settings          |
+| **volunteer**    | Volunteer operations           | Registration, skills, availability      |
+| **project**      | Project management             | Creation, updates, status tracking      |
+| **organization** | Organization operations        | Management, verification, settings      |
+| **nft**          | NFT operations                 | Minting, transfers, metadata            |
+| **messaging**    | Communication                  | Real-time messaging, notifications      |
+| **metrics**      | Analytics                      | Usage statistics, reporting             |
+| **photo**        | Media management               | Upload, storage, optimization           |
+| **wallet**       | Blockchain wallet              | Stellar integration, verification       |
 
 ### Shared Module
 
 The `shared` module contains:
+
 - Common utilities and helpers
 - Shared domain entities
 - Cross-cutting concerns
@@ -262,6 +269,7 @@ The `shared` module contains:
 ### Production Setup
 
 1. **Environment Configuration**
+
    ```bash
    # Set production environment variables
    NODE_ENV=production
@@ -270,11 +278,13 @@ The `shared` module contains:
    ```
 
 2. **Database Migration**
+
    ```bash
    npm run db:migrate
    ```
 
 3. **Build Application**
+
    ```bash
    npm run build
    ```
@@ -372,11 +382,11 @@ The Email Verification system allows users to verify their email addresses durin
 
 ## Features
 
--   Automatic email verification token generation and sending during registration
--   Token expiration after 24 hours for security
--   Email verification endpoint to validate tokens
--   Resend verification email functionality for users who did not receive or have expired tokens
--   Authentication middleware that restricts access to authenticated routes for non-verified users
+- Automatic email verification token generation and sending during registration
+- Token expiration after 24 hours for security
+- Email verification endpoint to validate tokens
+- Resend verification email functionality for users who did not receive or have expired tokens
+- Authentication middleware that restricts access to authenticated routes for non-verified users
 
 ## Usage
 
@@ -414,17 +424,17 @@ If a user did not receive the verification email or the token has expired, they 
 
 The email verification system follows Domain-Driven Design principles:
 
--   **Domain Layer:**
-    -   `User` entity extended with `isVerified`, `verificationToken`, and `verificationTokenExpires` attributes
-    -   `IUserRepository` interface updated with verification-related methods
--   **Repository Layer:**
-    -   `PrismaUserRepository` implements methods for finding users by verification token, setting tokens, and verifying users
--   **Use Cases:**
-    -   `SendVerificationEmailUseCase`: Handles sending verification emails to users
-    -   `VerifyEmailUseCase`: Validates tokens and marks users as verified
-    -   `ResendVerificationEmailUseCase`: Generates new tokens and resends verification emails
--   **Authentication:**
-    -   `AuthMiddleware` has been updated to check if a user is verified before allowing access to protected routes
+- **Domain Layer:**
+  - `User` entity extended with `isVerified`, `verificationToken`, and `verificationTokenExpires` attributes
+  - `IUserRepository` interface updated with verification-related methods
+- **Repository Layer:**
+  - `PrismaUserRepository` implements methods for finding users by verification token, setting tokens, and verifying users
+- **Use Cases:**
+  - `SendVerificationEmailUseCase`: Handles sending verification emails to users
+  - `VerifyEmailUseCase`: Validates tokens and marks users as verified
+  - `ResendVerificationEmailUseCase`: Generates new tokens and resends verification emails
+- **Authentication:**
+  - `AuthMiddleware` has been updated to check if a user is verified before allowing access to protected routes
 
 ## Environment Configuration
 
@@ -457,31 +467,38 @@ The Wallet Verification system integrates with Stellar's Horizon API to verify t
 The wallet verification system follows Domain-Driven Design principles:
 
 ### Domain Layer
+
 - `WalletVerification` entity: Represents wallet verification results
 - `StellarAddress` value object: Encapsulates Stellar address validation logic
 - `IWalletRepository` interface: Defines wallet verification operations
 
 ### Repository Layer
+
 - `HorizonWalletRepository`: Implements Horizon API integration for wallet verification
 
 ### Use Cases
+
 - `VerifyWalletUseCase`: Handles complete wallet verification including network calls
 - `ValidateWalletFormatUseCase`: Validates wallet address format only (no network calls)
 
 ### DTOs
+
 - `WalletVerificationRequestDto`: Request structure for wallet verification
 - `WalletVerificationResponseDto`: Response structure with verification results
 
 ### Services
+
 - `WalletService`: High-level service for wallet operations
 
 ## API Endpoints
 
 ### Wallet Verification
+
 - `POST /auth/verify-wallet` - Fully verify a wallet address (format + network)
 - `POST /auth/validate-wallet-format` - Validate wallet address format only
 
 ### Integration with Auth Endpoints
+
 - `POST /auth/register` - Now includes wallet verification before user creation
 - `POST /auth/login` - Now validates wallet address before authentication
 
