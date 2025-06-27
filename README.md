@@ -1,163 +1,353 @@
 # VolunChain
 
-**Innovating Volunteering with Blockchain 🚀**
+**Innovating Volunteering with Blockchain ��**
 
-VolunChain is a blockchain-powered platform that connects volunteers with organizations in a transparent, decentralized, and efficient way. Our mission is to make volunteering more accessible, secure, and rewarding for everyone .
+VolunChain is a production-grade blockchain-powered platform that connects volunteers with organizations in a transparent, decentralized, and efficient way. Built with Domain-Driven Design principles and strict architectural standards.
 
 ---
 
 ## 🌟 Key Features
 
-- **Opportunity Connection:** Match volunteers with organizations.
-- **NFT Certifications:** Reward achievements with unique digital collectibles.
-- **Tokenized Rewards:** Incentivize volunteers with blockchain tokens.
-- **Community Governance:** A planned DAO model for user-driven decisions.
-- **Transparency & Security:** All data and transactions are verifiable and secure.
-- **Global Reach:** Designed to connect communities worldwide.
+- **Opportunity Connection:** Match volunteers with organizations
+- **NFT Certifications:** Reward achievements with unique digital collectibles
+- **Tokenized Rewards:** Incentivize volunteers with blockchain tokens
+- **Community Governance:** DAO model for user-driven decisions
+- **Transparency & Security:** All data and transactions are verifiable and secure
+- **Global Reach:** Designed to connect communities worldwide
 
 ---
 
-## 🌟 **Important!**
+## 🏗️ Architecture
 
-If you found this repository helpful or contributed to it, **please give it a ⭐ on GitHub!**  
-Your support helps us grow and motivates us to continue improving VolunChain. 🙌
+VolunChain follows **Domain-Driven Design (DDD)** with a strict modular architecture:
+
+```
+src/
+├── modules/                     # Domain modules
+│   ├── auth/                    # Authentication & authorization
+│   ├── user/                    # User management
+│   ├── volunteer/               # Volunteer operations
+│   ├── project/                 # Project management
+│   ├── organization/            # Organization operations
+│   ├── nft/                     # NFT & blockchain operations
+│   ├── messaging/               # Communication system
+│   ├── metrics/                 # Analytics & reporting
+│   ├── photo/                   # Media management
+│   ├── wallet/                  # Blockchain wallet operations
+│   └── shared/                  # Shared kernel
+├── config/                      # Application configuration
+├── types/                       # Global type definitions
+└── index.ts                     # Application entry point
+```
+
+### Module Structure
+
+Every module follows this strict structure:
+
+```
+src/modules/<domain>/
+├── __tests__/                   # All tests (unit, integration, e2e)
+├── domain/                      # Domain layer (business logic)
+│   ├── entities/                # Domain entities
+│   ├── value-objects/           # Value objects
+│   ├── interfaces/              # Domain interfaces
+│   └── exceptions/              # Domain exceptions
+├── application/                 # Application layer
+│   ├── services/                # Application services
+│   ├── use-cases/               # Business use cases
+│   └── interfaces/              # Application interfaces
+├── infrastructure/              # Infrastructure layer
+│   ├── repositories/            # Repository implementations
+│   ├── services/                # External services
+│   └── adapters/                # External adapters
+├── presentation/                # Presentation layer
+│   ├── controllers/             # HTTP controllers
+│   ├── routes/                  # Express routes
+│   ├── middlewares/             # Module middlewares
+│   └── dto/                     # Data Transfer Objects
+└── README.md                    # Module documentation
+```
 
 ---
 
-## 🛠️ Technologies Used
+## 🛠️ Technology Stack
 
-- **Frontend:** React, Next.js.
-- **Backend:** Node.js, Express, Prisma.
-- **Blockchain:** Stellar, Rust.
-- **Database:** PostgreSQL, Prisma.
-- **Containers:** Docker for consistent environments.
+- **Runtime:** Node.js 18+, TypeScript
+- **Framework:** Express.js
+- **Database:** PostgreSQL (production), SQLite (testing)
+- **ORM:** Prisma
+- **Blockchain:** Stellar, Soroban
+- **Validation:** class-validator, class-transformer
+- **Testing:** Jest, Supertest
+- **Documentation:** OpenAPI/Swagger
+- **Containerization:** Docker, Docker Compose
 - **Architecture:** Domain-Driven Design (DDD)
 
 ---
 
-## 🏗️ Project Structure
+## 🚀 Quick Start
 
-The project follows Domain-Driven Design principles with the following structure:
+### Prerequisites
 
-```
-src/
-├── modules/
-│   └── project/
-│       ├── domain/           # Domain entities and value objects
-│       ├── repositories/     # Repository interfaces and implementations
-│       ├── use-cases/        # Application business logic
-│       └── dto/             # Data Transfer Objects
-├── shared/                  # Shared kernel
-└── infrastructure/          # External services and implementations
-```
-
-### Domain Layer
-
-- Contains business entities and value objects
-- Implements domain logic and business rules
-- Independent of external concerns
-
-### Repository Layer
-
-- Defines interfaces for data access
-- Implements data persistence logic
-- Abstracts database operations
-
-### Use Cases Layer
-
-- Implements application business logic
-- Orchestrates domain objects
-- Handles transaction boundaries
-
-### DTO Layer
-
-- Defines data structures for API communication
-- Handles data validation and transformation
-- Separates domain models from API contracts
-
----
-
-## 🚀 Installation
-
-Follow these steps to set up the backend locally:
-
-### Prerequisites:
-
-- Node.js (v18 or higher)
+- Node.js 18+
 - Docker & Docker Compose
+- Git
 
-### Steps:
+### Installation
 
-1. **Clone the Repository**:
+1. **Clone the repository**
 
    ```bash
    git clone https://github.com/your-repo/volunchain-backend.git
    cd volunchain-backend
    ```
 
-2. **Set Up Environment Variables**:
-   Create a `.env` file:
-
-   ```env
-   DATABASE_URL=postgresql://volunchain:volunchain123@localhost:5432/volunchain
-   PORT=3000
-   JWT_SECRET=your-jwt-secret
-   ```
-
-3. **Start PostgreSQL with Docker**:
-
-   ```bash
-   docker-compose up -d
-   ```
-
-4. **Install Dependencies**:
+2. **Install dependencies**
 
    ```bash
    npm install
    ```
 
-5. **Run the Development Server**:
+3. **Environment setup**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+4. **Start database**
+
+   ```bash
+   docker-compose up -d
+   ```
+
+5. **Run migrations**
+
+   ```bash
+   npm run db:migrate
+   npm run db:seed
+   ```
+
+6. **Start development server**
    ```bash
    npm run dev
    ```
 
+The API will be available at `http://localhost:3000`
+
 ---
 
-## 🤝 How to Contribute
+## 🧪 Testing
 
-1. Fork the repository.
-2. Create a branch for your changes:
+### Test Setup
+
+```bash
+# Create test environment
+cp .env.example .env.test
+# Set DB_TYPE=sqlite in .env.test
+
+# Run all tests
+npm test
+
+# Run specific test types
+npm run test:unit          # Unit tests
+npm run test:integration   # Integration tests
+npm run test:e2e          # End-to-end tests
+
+# Run tests for specific module
+npm test -- --testPathPattern=modules/user
+```
+
+### Test Coverage
+
+- **Unit Tests**: Test individual functions/classes
+- **Integration Tests**: Test module interactions
+- **E2E Tests**: Test complete user workflows
+- **Coverage Target**: 80% minimum per module
+
+---
+
+## 📚 API Documentation
+
+### Interactive Documentation
+
+- **Swagger UI**: `http://localhost:3000/api-docs`
+- **OpenAPI Spec**: `http://localhost:3000/openapi.yaml`
+
+### Authentication
+
+Most endpoints require authentication via JWT token:
+
+```bash
+# Login to get token
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password"}'
+
+# Use token in subsequent requests
+curl -H "Authorization: Bearer <token>" \
+  http://localhost:3000/api/v1/users/profile
+```
+
+---
+
+## 🔧 Development
+
+### Code Quality
+
+```bash
+# Linting
+npm run lint
+
+# Formatting
+npm run format
+
+# Type checking
+npm run type-check
+
+# All quality checks
+npm run quality
+```
+
+### Pre-commit Hooks
+
+The project uses pre-commit hooks that automatically:
+
+- Run ESLint for code style
+- Run Prettier for formatting
+- Run TypeScript type checking
+- Run affected tests
+
+### Database Management
+
+```bash
+# Generate migration
+npm run db:migrate:generate
+
+# Run migrations
+npm run db:migrate
+
+# Reset database
+npm run db:reset
+
+# Seed database
+npm run db:seed
+```
+
+---
+
+## 📁 Module Overview
+
+### Core Modules
+
+| Module           | Purpose                        | Key Features                            |
+| ---------------- | ------------------------------ | --------------------------------------- |
+| **auth**         | Authentication & authorization | JWT, email verification, password reset |
+| **user**         | User management                | Profile, preferences, settings          |
+| **volunteer**    | Volunteer operations           | Registration, skills, availability      |
+| **project**      | Project management             | Creation, updates, status tracking      |
+| **organization** | Organization operations        | Management, verification, settings      |
+| **nft**          | NFT operations                 | Minting, transfers, metadata            |
+| **messaging**    | Communication                  | Real-time messaging, notifications      |
+| **metrics**      | Analytics                      | Usage statistics, reporting             |
+| **photo**        | Media management               | Upload, storage, optimization           |
+| **wallet**       | Blockchain wallet              | Stellar integration, verification       |
+
+### Shared Module
+
+The `shared` module contains:
+
+- Common utilities and helpers
+- Shared domain entities
+- Cross-cutting concerns
+- Infrastructure adapters
+
+---
+
+## 🚀 Deployment
+
+### Production Setup
+
+1. **Environment Configuration**
+
    ```bash
-   git checkout -b feature/new-feature
+   # Set production environment variables
+   NODE_ENV=production
+   DATABASE_URL=your-production-db-url
+   JWT_SECRET=your-secure-jwt-secret
    ```
-3. Commit your changes:
-   i. The project uses pre-commit hooks to ensure code quality. They will automatically:
 
-   - Run ESLint to check code style
-   - Run Prettier to format code
-   - Run tests to ensure everything works
-
-   ii. For urgent commits that need to bypass checks:
+2. **Database Migration**
 
    ```bash
-   git commit -m "urgent fix" --no-verify
+   npm run db:migrate
    ```
+
+3. **Build Application**
 
    ```bash
-   git commit -m "Add new feature"
+   npm run build
    ```
 
-4. Push and create a Pull Request.
+4. **Start Production Server**
+   ```bash
+   npm start
+   ```
+
+### Docker Deployment
+
+```bash
+# Build image
+docker build -t volunchain-backend .
+
+# Run container
+docker run -p 3000:3000 volunchain-backend
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) for:
+
+- **Architecture standards** and module structure
+- **Coding conventions** and best practices
+- **Testing requirements** and quality standards
+- **Development workflow** and PR guidelines
+
+### Quick Contribution Steps
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Follow the coding standards in CONTRIBUTING.md
+4. Write tests for your changes
+5. Commit your changes: `git commit -m 'Add amazing feature'`
+6. Push to the branch: `git push origin feature/amazing-feature`
+7. Open a Pull Request
 
 ---
 
 ## 📄 License
 
-This project is licensed under the [MIT License](https://opensource.org/license/mit).
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-## 🎉 Empowering Volunteerism, One Block at a Time.
+## 🆘 Support
+
+- **Documentation**: Check module README files
+- **Issues**: [GitHub Issues](https://github.com/your-repo/volunchain-backend/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-repo/volunchain-backend/discussions)
+
+---
+
+## 🌟 Star the Repository
+
+If you found this project helpful, please give it a ⭐ on GitHub! Your support helps us grow and motivates us to continue improving VolunChain.
+
+---
+
+**Built with ❤️ for the volunteer community**
 
 ## Rate Limiting Configuration
 
@@ -192,11 +382,11 @@ The Email Verification system allows users to verify their email addresses durin
 
 ## Features
 
--   Automatic email verification token generation and sending during registration
--   Token expiration after 24 hours for security
--   Email verification endpoint to validate tokens
--   Resend verification email functionality for users who did not receive or have expired tokens
--   Authentication middleware that restricts access to authenticated routes for non-verified users
+- Automatic email verification token generation and sending during registration
+- Token expiration after 24 hours for security
+- Email verification endpoint to validate tokens
+- Resend verification email functionality for users who did not receive or have expired tokens
+- Authentication middleware that restricts access to authenticated routes for non-verified users
 
 ## Usage
 
@@ -234,17 +424,17 @@ If a user did not receive the verification email or the token has expired, they 
 
 The email verification system follows Domain-Driven Design principles:
 
--   **Domain Layer:**
-    -   `User` entity extended with `isVerified`, `verificationToken`, and `verificationTokenExpires` attributes
-    -   `IUserRepository` interface updated with verification-related methods
--   **Repository Layer:**
-    -   `PrismaUserRepository` implements methods for finding users by verification token, setting tokens, and verifying users
--   **Use Cases:**
-    -   `SendVerificationEmailUseCase`: Handles sending verification emails to users
-    -   `VerifyEmailUseCase`: Validates tokens and marks users as verified
-    -   `ResendVerificationEmailUseCase`: Generates new tokens and resends verification emails
--   **Authentication:**
-    -   `AuthMiddleware` has been updated to check if a user is verified before allowing access to protected routes
+- **Domain Layer:**
+  - `User` entity extended with `isVerified`, `verificationToken`, and `verificationTokenExpires` attributes
+  - `IUserRepository` interface updated with verification-related methods
+- **Repository Layer:**
+  - `PrismaUserRepository` implements methods for finding users by verification token, setting tokens, and verifying users
+- **Use Cases:**
+  - `SendVerificationEmailUseCase`: Handles sending verification emails to users
+  - `VerifyEmailUseCase`: Validates tokens and marks users as verified
+  - `ResendVerificationEmailUseCase`: Generates new tokens and resends verification emails
+- **Authentication:**
+  - `AuthMiddleware` has been updated to check if a user is verified before allowing access to protected routes
 
 ## Environment Configuration
 
@@ -277,31 +467,38 @@ The Wallet Verification system integrates with Stellar's Horizon API to verify t
 The wallet verification system follows Domain-Driven Design principles:
 
 ### Domain Layer
+
 - `WalletVerification` entity: Represents wallet verification results
 - `StellarAddress` value object: Encapsulates Stellar address validation logic
 - `IWalletRepository` interface: Defines wallet verification operations
 
 ### Repository Layer
+
 - `HorizonWalletRepository`: Implements Horizon API integration for wallet verification
 
 ### Use Cases
+
 - `VerifyWalletUseCase`: Handles complete wallet verification including network calls
 - `ValidateWalletFormatUseCase`: Validates wallet address format only (no network calls)
 
 ### DTOs
+
 - `WalletVerificationRequestDto`: Request structure for wallet verification
 - `WalletVerificationResponseDto`: Response structure with verification results
 
 ### Services
+
 - `WalletService`: High-level service for wallet operations
 
 ## API Endpoints
 
 ### Wallet Verification
+
 - `POST /auth/verify-wallet` - Fully verify a wallet address (format + network)
 - `POST /auth/validate-wallet-format` - Validate wallet address format only
 
 ### Integration with Auth Endpoints
+
 - `POST /auth/register` - Now includes wallet verification before user creation
 - `POST /auth/login` - Now validates wallet address before authentication
 

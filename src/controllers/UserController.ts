@@ -2,7 +2,7 @@ import { CreateUserDto } from "../modules/user/dto/CreateUserDto";
 import { UserService } from "../services/UserService";
 import { Response } from "express";
 import { UpdateUserDto } from "../modules/user/dto/UpdateUserDto";
-import { AuthenticatedRequest } from "../middleware/authMiddleware";
+import { AuthenticatedRequest } from "../types/auth.types";
 
 class UserController {
   private userService = new UserService();

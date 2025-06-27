@@ -7,7 +7,7 @@ import {
 } from "express";
 import UserController from "../controllers/UserController";
 import { authMiddleware } from "../middleware/authMiddleware";
-import { AuthenticatedRequest } from "../middleware/authMiddleware";
+import { AuthenticatedRequest } from "../types/auth.types";
 
 const userController = new UserController();
 const router = Router();
