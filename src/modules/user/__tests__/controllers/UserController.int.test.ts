@@ -8,17 +8,20 @@ jest.mock("../../../../services/UserService");
 import { UserService } from "../../../../services/UserService";
 
 // Mock DTOs
-jest.mock("../../../../modules/user/dto/CreateUserDto", () => {
+jest.mock("../../dto/CreateUserDto", () => {
   return {
-    CreateUserDto: function () {
-      return {};
+    CreateUserDto: function (data: Record<string, unknown>) {
+      // Mock validation logic
+      if (!data.email) throw new Error("Email is required");
+      return { email: data.email, ...data };
     },
   };
 });
-jest.mock("../../../../modules/user/dto/UpdateUserDto", () => {
+jest.mock("../../dto/UpdateUserDto", () => {
   return {
-    UpdateUserDto: function () {
-      return {};
+    UpdateUserDto: function (data: Record<string, unknown>) {
+      // Mock basic validation similar to CreateUserDto
+      return { ...data };
     },
   };
 });
@@ -34,6 +37,10 @@ function setupApp(): Express {
   return app;
 }
 
+const setupMockUserService = (methods: Partial<Record<string, unknown>>) => {
+  (UserService as jest.Mock).mockImplementation(() => methods);
+};
+
 describe("UserController", () => {
   let app: Express;
 
@@ -45,9 +52,9 @@ describe("UserController", () => {
   describe("POST /users", () => {
     it("should create a user and return 201", async () => {
       const mockUser = { id: "1", email: "test@example.com" };
-      (UserService as jest.Mock).mockImplementation(() => ({
+      setupMockUserService({
         createUser: jest.fn().mockResolvedValue(mockUser),
-      }));
+      });
       const res = await request(app)
         .post("/users")
         .send({ email: "test@example.com" });
@@ -64,6 +71,19 @@ describe("UserController", () => {
         .send({ email: "test@example.com" });
       expect(res.status).toBe(400);
       expect(res.body.error).toBe("fail");
+    });
+
+    it("should handle validation errors with specific status codes", async () => {
+      (UserService as jest.Mock).mockImplementation(() => ({
+        createUser: jest
+          .fn()
+          .mockRejectedValue(new Error("Invalid email format")),
+      }));
+      const res = await request(app)
+        .post("/users")
+        .send({ email: "invalid-email" });
+      expect(res.status).toBe(422);
+      expect(res.body.error).toContain("Ivalid email format");
     });
   });
 
