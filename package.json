@@ -4,6 +4,8 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
+    "test:dto": "jest --runInBand src/modules/auth/__tests__/dto --detectOpenHandles",
+    "test:dto:independent": "jest --runInBand src/modules/auth/__tests__/dto --detectOpenHandles",
     "dev": "ts-node-dev src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
