@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { MessagingController } from "../controllers/MessagingController";
-import { MessagingService } from "../services/MessagingService";
+import { MessagingService } from "../application/services/MessagingService";
 import { MessagePrismaRepository } from "../repositories/implementations/message-prisma.repository";
 import { authMiddleware } from "../../../middleware/authMiddleware";
 import { PrismaClient } from "@prisma/client";

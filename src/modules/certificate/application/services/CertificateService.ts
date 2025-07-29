@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import { generateCertificate } from "../utils/pdfGenerator";
-import { prisma } from "../../../config/prisma";
+import { generateCertificate } from "../../infrastructure/utils/pdfGenerator";
+import { prisma } from "../../../../config/prisma";
 import {
   S3Client,
   PutObjectCommand,

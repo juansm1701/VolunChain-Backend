@@ -1,8 +1,8 @@
 import AuthService from "../../../services/AuthService";
-import { WalletService } from "../services/WalletService";
+import { WalletService } from "../application/services/WalletService";
 
 // Mock the wallet service
-jest.mock("../services/WalletService");
+jest.mock("../application/services/WalletService");
 jest.mock("../../../config/prisma", () => ({
   prisma: {
     user: {
