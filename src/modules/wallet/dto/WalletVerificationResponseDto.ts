@@ -32,12 +32,12 @@ export class WalletVerificationResponseDto {
   }
 
   public static fromWalletVerification(
-    verification: import('../domain/entities/WalletVerification').WalletVerification
+    verification: import("../domain/entities/WalletVerification").WalletVerification
   ): WalletVerificationResponseDto {
     const success = verification.isValid;
-    const message = verification.isVerified() 
-      ? 'Wallet verified successfully' 
-      : verification.errorMessage || 'Wallet verification failed';
+    const message = verification.isVerified()
+      ? "Wallet verified successfully"
+      : verification.errorMessage || "Wallet verification failed";
 
     return new WalletVerificationResponseDto(
       success,

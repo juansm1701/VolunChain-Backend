@@ -1,4 +1,3 @@
-
 declare module "redis" {
   import { EventEmitter } from "events";
 

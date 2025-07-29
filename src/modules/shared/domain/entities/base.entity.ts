@@ -1,32 +1,36 @@
-import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm"
+import {
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn("uuid")
-  id: string
+  id: string;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }
 
 export abstract class Entity<T> {
-  protected readonly props: T
+  protected readonly props: T;
 
   constructor(props: T) {
-    this.props = props
+    this.props = props;
   }
 
   public equals(entity: Entity<T>): boolean {
     if (entity === null || entity === undefined) {
-      return false
+      return false;
     }
 
     if (this === entity) {
-      return true
+      return true;
     }
 
-    return JSON.stringify(this.props) === JSON.stringify(entity.props)
+    return JSON.stringify(this.props) === JSON.stringify(entity.props);
   }
 }

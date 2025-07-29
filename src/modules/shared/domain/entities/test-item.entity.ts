@@ -1,47 +1,47 @@
-import { Entity, Column } from "typeorm"
-import { BaseEntity } from "./base.entity"
+import { Entity, Column } from "typeorm";
+import { BaseEntity } from "./base.entity";
 
 @Entity("test_items")
 export class TestItem extends BaseEntity {
   @Column()
-  name: string
+  name: string;
 
   @Column()
-  value: number
+  value: number;
 
   @Column()
-  age: number
+  age: number;
 
   // Domain methods
   public static create(name: string, value: number, age: number): TestItem {
     if (!name || name.trim() === "") {
-      throw new Error("Name is required")
+      throw new Error("Name is required");
     }
 
     if (value < 0) {
-      throw new Error("Value must be non-negative")
+      throw new Error("Value must be non-negative");
     }
 
     if (age < 0) {
-      throw new Error("Age must be non-negative")
+      throw new Error("Age must be non-negative");
     }
 
-    const testItem = new TestItem()
-    testItem.name = name
-    testItem.value = value
-    testItem.age = age
+    const testItem = new TestItem();
+    testItem.name = name;
+    testItem.value = value;
+    testItem.age = age;
 
-    return testItem
+    return testItem;
   }
 
   public updateValue(newValue: number): void {
     if (newValue < 0) {
-      throw new Error("Value must be non-negative")
+      throw new Error("Value must be non-negative");
     }
-    this.value = newValue
+    this.value = newValue;
   }
 
   public incrementAge(): void {
-    this.age += 1
+    this.age += 1;
   }
 }

@@ -11,7 +11,11 @@ export interface IUserRepository {
   ): Promise<{ users: IUser[]; total: number }>;
   update(user: Partial<IUser>): Promise<IUser>;
   delete(id: string): Promise<void>;
-  setVerificationToken(userId: string, token: string, expires: Date): Promise<any>;
+  setVerificationToken(
+    userId: string,
+    token: string,
+    expires: Date
+  ): Promise<any>;
   isUserVerified(userId: string): Promise<boolean>;
   verifyUser(userId: string): Promise<any>;
 }

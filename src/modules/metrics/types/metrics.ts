@@ -28,4 +28,4 @@ export interface ProjectImpactMetrics {
     userName: string;
     hoursContributed: number;
   }[];
-} 
+}

@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { MetricsService } from '../services/MetricsService';
+import { Request, Response } from "express";
+import { MetricsService } from "../services/MetricsService";
 
 export class MetricsController {
   private metricsService: MetricsService;
@@ -17,8 +17,8 @@ export class MetricsController {
       const metrics = await this.metricsService.getGlobalMetrics();
       res.status(200).json(metrics);
     } catch (error) {
-      console.error('Error al obtener métricas globales:', error);
-      res.status(500).json({ error: 'Error al obtener métricas de impacto' });
+      console.error("Error al obtener métricas globales:", error);
+      res.status(500).json({ error: "Error al obtener métricas de impacto" });
     }
   }
 
@@ -30,21 +30,23 @@ export class MetricsController {
     try {
       const projectId = req.params.id;
       if (!projectId) {
-        res.status(400).json({ error: 'ID de proyecto no proporcionado' });
+        res.status(400).json({ error: "ID de proyecto no proporcionado" });
         return;
       }
 
       const metrics = await this.metricsService.getProjectMetrics(projectId);
-      
+
       if (!metrics) {
-        res.status(404).json({ error: 'Proyecto no encontrado' });
+        res.status(404).json({ error: "Proyecto no encontrado" });
         return;
       }
 
       res.status(200).json(metrics);
     } catch (error) {
-      console.error('Error al obtener métricas del proyecto:', error);
-      res.status(500).json({ error: 'Error al obtener métricas de impacto del proyecto' });
+      console.error("Error al obtener métricas del proyecto:", error);
+      res
+        .status(500)
+        .json({ error: "Error al obtener métricas de impacto del proyecto" });
     }
   }
 
@@ -56,21 +58,26 @@ export class MetricsController {
     try {
       const organizationId = req.params.id;
       if (!organizationId) {
-        res.status(400).json({ error: 'ID de organización no proporcionado' });
+        res.status(400).json({ error: "ID de organización no proporcionado" });
         return;
       }
 
-      const metrics = await this.metricsService.getOrganizationMetrics(organizationId);
-      
+      const metrics =
+        await this.metricsService.getOrganizationMetrics(organizationId);
+
       if (!metrics) {
-        res.status(404).json({ error: 'Organización no encontrada' });
+        res.status(404).json({ error: "Organización no encontrada" });
         return;
       }
 
       res.status(200).json(metrics);
     } catch (error) {
-      console.error('Error al obtener métricas de la organización:', error);
-      res.status(500).json({ error: 'Error al obtener métricas de impacto de la organización' });
+      console.error("Error al obtener métricas de la organización:", error);
+      res
+        .status(500)
+        .json({
+          error: "Error al obtener métricas de impacto de la organización",
+        });
     }
   }
-} 
+}

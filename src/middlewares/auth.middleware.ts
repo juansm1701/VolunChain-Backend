@@ -1,6 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { DecodedUser, AuthenticatedUser, toAuthenticatedUser } from '../types/auth.types';
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import {
+  DecodedUser,
+  AuthenticatedUser,
+  toAuthenticatedUser,
+} from "../types/auth.types";
 
 /**
  * Middleware que permite el acceso a la ruta incluso si el usuario no está autenticado,

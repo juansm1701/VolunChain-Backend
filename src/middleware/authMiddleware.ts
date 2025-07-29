@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaUserRepository } from "../modules/user/repositories/PrismaUserRepository";
-import { AuthenticatedRequest, DecodedUser, toAuthenticatedUser } from "../types/auth.types";
-
-
+import {
+  AuthenticatedRequest,
+  DecodedUser,
+  toAuthenticatedUser,
+} from "../types/auth.types";
 
 const SECRET_KEY = process.env.JWT_SECRET || "defaultSecret";
 const userRepository = new PrismaUserRepository();
@@ -84,15 +86,15 @@ export const requireVerifiedEmail = async (
     next();
   } catch (error) {
     // Use basic console.error here to avoid circular dependencies
-    console.error('Error checking email verification status:', error);
+    console.error("Error checking email verification status:", error);
     res.status(500).json({
-      message: 'Internal server error',
-      ...(req.traceId && { traceId: req.traceId })
+      message: "Internal server error",
+      ...(req.traceId && { traceId: req.traceId }),
     });
   }
 };
 
 export default {
   requireVerifiedEmail,
-  authMiddleware
+  authMiddleware,
 };

@@ -1,5 +1,5 @@
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -15,8 +15,8 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
     // Create a transporter
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
-      port: parseInt(process.env.EMAIL_PORT || '587'),
-      secure: process.env.EMAIL_SECURE === 'true',
+      port: parseInt(process.env.EMAIL_PORT || "587"),
+      secure: process.env.EMAIL_SECURE === "true",
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD,
@@ -25,7 +25,7 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
 
     // Email options
     const mailOptions = {
-      from: process.env.EMAIL_FROM || 'noreply@example.com',
+      from: process.env.EMAIL_FROM || "noreply@example.com",
       to: options.to,
       subject: options.subject,
       text: options.text,
@@ -35,7 +35,6 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
     // Send email
     await transporter.sendMail(mailOptions);
   } catch (error) {
-
-    throw new Error('Error sending email');
+    throw new Error("Error sending email");
   }
 };

@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   downloadCertificate,
   createCertificate,
-} from "../controllers/certificate.controller";
+} from "../modules/certificate/presentation/controllers/certificate.controller";
 import auth from "../middleware/authMiddleware";
 
 const router = Router();

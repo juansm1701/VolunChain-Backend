@@ -1,15 +1,15 @@
-import { StrKey } from '@stellar/stellar-sdk';
+import { StrKey } from "@stellar/stellar-sdk";
 
 export class StellarAddress {
   private readonly _value: string;
 
   constructor(address: string) {
     if (!address) {
-      throw new Error('Stellar address cannot be empty');
+      throw new Error("Stellar address cannot be empty");
     }
 
     if (!this.isValidFormat(address)) {
-      throw new Error('Invalid Stellar address format');
+      throw new Error("Invalid Stellar address format");
     }
 
     this._value = address;
@@ -32,7 +32,7 @@ export class StellarAddress {
       }
 
       return false;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

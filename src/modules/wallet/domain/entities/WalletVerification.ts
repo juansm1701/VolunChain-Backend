@@ -11,8 +11,8 @@ export class WalletVerification {
     walletAddress: string,
     isValid: boolean,
     accountExists: boolean,
-    balance: string = '0',
-    sequence: string = '0',
+    balance: string = "0",
+    sequence: string = "0",
     verifiedAt: Date = new Date(),
     errorMessage?: string
   ) {
@@ -25,13 +25,16 @@ export class WalletVerification {
     this.errorMessage = errorMessage;
   }
 
-  public static createInvalid(walletAddress: string, errorMessage: string): WalletVerification {
+  public static createInvalid(
+    walletAddress: string,
+    errorMessage: string
+  ): WalletVerification {
     return new WalletVerification(
       walletAddress,
       false,
       false,
-      '0',
-      '0',
+      "0",
+      "0",
       new Date(),
       errorMessage
     );

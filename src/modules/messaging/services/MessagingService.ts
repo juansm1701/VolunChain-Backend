@@ -1,6 +1,6 @@
-import { IMessageRepository } from '../repositories/interfaces/message-repository.interface';
-import { Message } from '../domain/entities/message.entity';
-import { PrismaClient } from '@prisma/client';
+import { IMessageRepository } from "../repositories/interfaces/message-repository.interface";
+import { Message } from "../domain/entities/message.entity";
+import { PrismaClient } from "@prisma/client";
 
 export class MessagingService {
   constructor(
@@ -17,7 +17,12 @@ export class MessagingService {
     // Check if both users are participants in the volunteer event
     await this.validateParticipants(senderId, receiverId, volunteerId);
 
-    return this.messageRepository.create(content, senderId, receiverId, volunteerId);
+    return this.messageRepository.create(
+      content,
+      senderId,
+      receiverId,
+      volunteerId
+    );
   }
 
   async getConversation(
@@ -39,19 +44,22 @@ export class MessagingService {
 
   async markMessageAsRead(messageId: string, userId: string): Promise<Message> {
     // Check if user is participant in this conversation
-    const isParticipant = await this.messageRepository.isUserParticipantInConversation(
-      messageId,
-      userId
-    );
+    const isParticipant =
+      await this.messageRepository.isUserParticipantInConversation(
+        messageId,
+        userId
+      );
 
     if (!isParticipant) {
-      throw new Error('Unauthorized: You cannot access this message');
+      throw new Error("Unauthorized: You cannot access this message");
     }
 
     const message = await this.messageRepository.markAsRead(messageId, userId);
-    
+
     if (!message) {
-      throw new Error('Message not found or you are not authorized to mark it as read');
+      throw new Error(
+        "Message not found or you are not authorized to mark it as read"
+      );
     }
 
     return message;
@@ -77,11 +85,11 @@ export class MessagingService {
     });
 
     if (!senderParticipation) {
-      throw new Error('Sender is not a participant in this volunteer event');
+      throw new Error("Sender is not a participant in this volunteer event");
     }
 
     if (!receiverParticipation) {
-      throw new Error('Receiver is not a participant in this volunteer event');
+      throw new Error("Receiver is not a participant in this volunteer event");
     }
   }
 
@@ -97,7 +105,7 @@ export class MessagingService {
     });
 
     if (!participation) {
-      throw new Error('User is not a participant in this volunteer event');
+      throw new Error("User is not a participant in this volunteer event");
     }
   }
 }

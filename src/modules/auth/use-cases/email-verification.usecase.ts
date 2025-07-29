@@ -1,16 +1,16 @@
-import { IUserRepository } from '../../../repository/IUserRepository';
-import { randomBytes } from 'crypto';
-import { sendVerificationEmail } from '../../../utils/email.utils';
+import { IUserRepository } from "../../../repository/IUserRepository";
+import { randomBytes } from "crypto";
+import { sendVerificationEmail } from "../../../utils/email.utils";
 
 export class EmailVerificationUseCase {
   constructor(private userRepository: IUserRepository) {}
 
   async sendVerificationEmail(email: string): Promise<void> {
     const user = await this.userRepository.findByEmail(email);
-    if (!user) throw new Error('User not found');
-    if (user.isVerified) throw new Error('User is already verified');
+    if (!user) throw new Error("User not found");
+    if (user.isVerified) throw new Error("User is already verified");
 
-    const token = randomBytes(32).toString('hex');
+    const token = randomBytes(32).toString("hex");
     const expires = new Date();
     expires.setHours(expires.getHours() + 1);
 
@@ -30,7 +30,7 @@ export class EmailVerificationUseCase {
       new Date() > user.verificationTokenExpires
     ) {
       throw new Error(
-        'Token expired. Please request a new verification email.'
+        "Token expired. Please request a new verification email."
       );
     }
 

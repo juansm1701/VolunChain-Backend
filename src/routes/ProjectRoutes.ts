@@ -1,5 +1,5 @@
 import { Router } from "express";
-import ProjectController from "../controllers/Project.controller";
+import ProjectController from "../modules/project/presentation/controllers/Project.controller.stub";
 
 const router = Router();
 const projectController = new ProjectController();
@@ -13,7 +13,3 @@ router.get("/organizations/:organizationId", async (req, res) =>
 );
 
 export default router;
-
-
-
-

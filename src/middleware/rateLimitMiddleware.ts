@@ -1,14 +1,14 @@
 import express, { Request, Response, NextFunction, Router } from "express";
 import { RateLimitUseCase } from "./../modules/shared/middleware/rate-limit/use-cases/rate-limit-use-case";
-import { createLogger } from "../services/logger.service";
+import { Logger } from "../utils/logger";
 
 export class RateLimitMiddleware {
   private rateLimitUseCase: RateLimitUseCase;
-  private logger: ReturnType<typeof createLogger>;
+  private logger: Logger;
 
   constructor(rateLimitUseCase?: RateLimitUseCase) {
     this.rateLimitUseCase = rateLimitUseCase || new RateLimitUseCase();
-    this.logger = createLogger("RATE_LIMIT_MIDDLEWARE");
+    this.logger = new Logger("RATE_LIMIT_MIDDLEWARE");
   }
 
   // Returning a middleware function
@@ -25,12 +25,12 @@ export class RateLimitMiddleware {
         if (!allowed) {
           this.logger.warn(
             `Rate limit exceeded for ${req.ip} on ${req.path}`,
-            req,
             {
               remaining,
               retryAfter,
               ip: req.ip,
-              path: req.path
+              path: req.path,
+              traceId: req.traceId,
             }
           );
           return res.status(429).json({
@@ -38,13 +38,20 @@ export class RateLimitMiddleware {
             message:
               "You have exceeded the rate limit. Please try again later.",
             retryAfter: retryAfter * 60 + " seconds", // Default retry after 1 minute
-            ...(req.traceId && { traceId: req.traceId })
+            ...(req.traceId && { traceId: req.traceId }),
           });
         }
 
         next();
       } catch (error) {
-        this.logger.error("Rate limit check failed", error, req);
+        this.logger.error("Rate limit check failed", {
+          error: error instanceof Error ? error.message : error,
+          stack: error instanceof Error ? error.stack : undefined,
+          path: req.path,
+          method: req.method,
+          ip: req.ip,
+          traceId: req.traceId,
+        });
         next(error);
       }
     };

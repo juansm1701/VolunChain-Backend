@@ -1,11 +1,14 @@
-import { IUserRepository } from '../../user/domain/interfaces/IUserRepository';
-import { VerifyEmailRequestDTO, VerifyEmailResponseDTO } from '../dto/email-verification.dto';
+import { IUserRepository } from "../../user/domain/interfaces/IUserRepository";
+import {
+  VerifyEmailRequestDTO,
+  VerifyEmailResponseDTO,
+} from "../dto/email-verification.dto";
 
 export class VerifyEmailUseCase {
   constructor(private userRepository: IUserRepository) {}
 
   async execute(dto: VerifyEmailRequestDTO): Promise<VerifyEmailResponseDTO> {
-    try{
+    try {
       const { token } = dto;
 
       // Find user by verification token
@@ -13,7 +16,7 @@ export class VerifyEmailUseCase {
       if (!user) {
         return {
           success: false,
-          message: 'Invalid or expired verification token',
+          message: "Invalid or expired verification token",
           verified: false,
         };
       }
@@ -22,14 +25,17 @@ export class VerifyEmailUseCase {
       if (user.isVerified) {
         return {
           success: true,
-          message: 'Email already verified',
+          message: "Email already verified",
           verified: true,
         };
       }
-      
+
       // check if token has expired
       const now = new Date();
-      if (user.verificationTokenExpires && new Date(user.verificationTokenExpires) < now) {
+      if (
+        user.verificationTokenExpires &&
+        new Date(user.verificationTokenExpires) < now
+      ) {
         throw new Error("Verification token has expired");
       }
 
@@ -38,11 +44,11 @@ export class VerifyEmailUseCase {
 
       return {
         success: true,
-        message: 'Email verified successfully',
+        message: "Email verified successfully",
         verified: true,
       };
-    }catch(error){
+    } catch (error) {
       throw new Error("Invalid or expired verification token");
-      }
-}
+    }
+  }
 }

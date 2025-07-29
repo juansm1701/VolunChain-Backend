@@ -3,4 +3,4 @@ export {
   VolunteerPositionFullError,
   VolunteerAlreadyRegisteredError,
   VolunteerNotFoundError,
-} from './volunteer-registration.errors';
+} from "./volunteer-registration.errors";
