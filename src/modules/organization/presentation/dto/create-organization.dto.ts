@@ -8,39 +8,39 @@ import {
 } from "class-validator";
 
 export class CreateOrganizationDto {
-  @IsString()
-  @MinLength(2)
-  @MaxLength(100)
+  @IsString({ message: "Name must be a string" })
+  @MinLength(2, { message: "Name must be at least 2 characters long" })
+  @MaxLength(100, { message: "Name cannot exceed 100 characters" })
   name: string;
 
-  @IsEmail()
+  @IsEmail({}, { message: "Please provide a valid email address" })
   email: string;
 
-  @IsString()
-  @MinLength(8)
+  @IsString({ message: "Password must be a string" })
+  @MinLength(8, { message: "Password must be at least 8 characters long" })
   password: string;
 
-  @IsString()
-  @MinLength(10)
-  @MaxLength(500)
+  @IsString({ message: "Description must be a string" })
+  @MinLength(10, { message: "Description must be at least 10 characters long" })
+  @MaxLength(500, { message: "Description cannot exceed 500 characters" })
   description: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(50)
+  @IsString({ message: "Category must be a string" })
+  @MaxLength(50, { message: "Category cannot exceed 50 characters" })
   category?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsUrl({}, { message: "Please provide a valid website URL" })
   website?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(200)
+  @IsString({ message: "Address must be a string" })
+  @MaxLength(200, { message: "Address cannot exceed 200 characters" })
   address?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(20)
+  @IsString({ message: "Phone must be a string" })
+  @MaxLength(20, { message: "Phone cannot exceed 20 characters" })
   phone?: string;
 }

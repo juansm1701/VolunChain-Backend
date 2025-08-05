@@ -4,19 +4,13 @@ import {
   MinLength,
   MaxLength,
   IsOptional,
-  Matches,
 } from "class-validator";
 
-export class CreateUserDto {
+export class RegisterDto {
   @IsString({ message: "Name must be a string" })
   @MinLength(2, { message: "Name must be at least 2 characters long" })
-  @MaxLength(50, { message: "Name cannot exceed 50 characters" })
+  @MaxLength(100, { message: "Name cannot exceed 100 characters" })
   name: string;
-
-  @IsString({ message: "Last name must be a string" })
-  @MinLength(2, { message: "Last name must be at least 2 characters long" })
-  @MaxLength(50, { message: "Last name cannot exceed 50 characters" })
-  lastName: string;
 
   @IsEmail({}, { message: "Please provide a valid email address" })
   email: string;
@@ -34,8 +28,5 @@ export class CreateUserDto {
   @MaxLength(56, {
     message: "Stellar wallet address must be 56 characters long",
   })
-  @Matches(/^G[A-Z2-7]{55}$/, {
-    message: "Invalid Stellar wallet address format",
-  })
-  wallet?: string;
+  walletAddress?: string;
 }
