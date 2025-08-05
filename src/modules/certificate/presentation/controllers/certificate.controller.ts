@@ -1,6 +1,6 @@
 import { container } from "../../../../shared/infrastructure/container";
 import { prisma } from "../../../../config/prisma";
-import { ICertificateService } from "../../../../shared/domain/interfaces/ICertificateService";
+import { ICertificateService } from "../../domain/interfaces/ICertificateService";
 import { AuthenticatedRequest } from "../../../../types/auth.types";
 import { Response } from "express";
 

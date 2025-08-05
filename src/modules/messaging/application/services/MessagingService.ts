@@ -1,5 +1,5 @@
-import { IMessageRepository } from "../repositories/interfaces/message-repository.interface";
-import { Message } from "../domain/entities/message.entity";
+import { IMessageRepository } from "../../repositories/interfaces/message-repository.interface";
+import { Message } from "../../domain/entities/message.entity";
 import { PrismaClient } from "@prisma/client";
 
 export class MessagingService {

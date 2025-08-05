@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { MessagingService } from "../services/MessagingService";
+import { MessagingService } from "../application/services/MessagingService";
 import { SendMessageDto, MessageResponseDto } from "../dto/message.dto";
 import { validate } from "class-validator";
 import { plainToClass } from "class-transformer";

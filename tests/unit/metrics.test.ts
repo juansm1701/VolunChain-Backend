@@ -1,4 +1,4 @@
-import { MetricsService } from '../../src/modules/metrics/services/MetricsService';
+import { MetricsService } from '../../src/modules/metrics/application/services/MetricsService';
 import { MetricsRepository } from '../../src/modules/metrics/repositories/MetricsRepository';
 import { ImpactMetrics, ProjectImpactMetrics } from '../../src/modules/metrics/types/metrics';
 

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { MetricsService } from "../services/MetricsService";
+import { MetricsService } from "../application/services/MetricsService";
 
 export class MetricsController {
   private metricsService: MetricsService;
