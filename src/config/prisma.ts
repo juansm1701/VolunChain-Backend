@@ -15,7 +15,6 @@ const prismaClientSingleton = () => {
 
 // Ensure we only create one instance of PrismaClient
 declare global {
-   
   var prisma: PrismaClient | undefined;
 }
 

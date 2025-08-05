@@ -1,8 +1,8 @@
-import { HorizonWalletRepository } from '../repositories/HorizonWalletRepository';
-import { VerifyWalletUseCase } from '../use-cases/VerifyWalletUseCase';
-import { ValidateWalletFormatUseCase } from '../use-cases/ValidateWalletFormatUseCase';
-import { WalletVerificationRequestDto } from '../dto/WalletVerificationRequestDto';
-import { WalletVerificationResponseDto } from '../dto/WalletVerificationResponseDto';
+import { HorizonWalletRepository } from "../repositories/HorizonWalletRepository";
+import { VerifyWalletUseCase } from "../use-cases/VerifyWalletUseCase";
+import { ValidateWalletFormatUseCase } from "../use-cases/ValidateWalletFormatUseCase";
+import { WalletVerificationRequestDto } from "../dto/WalletVerificationRequestDto";
+import { WalletVerificationResponseDto } from "../dto/WalletVerificationResponseDto";
 
 export class WalletService {
   private walletRepository: HorizonWalletRepository;
@@ -18,7 +18,9 @@ export class WalletService {
   /**
    * Validates wallet address format only (no network call)
    */
-  async validateWalletFormat(walletAddress: string): Promise<WalletVerificationResponseDto> {
+  async validateWalletFormat(
+    walletAddress: string
+  ): Promise<WalletVerificationResponseDto> {
     const dto = new WalletVerificationRequestDto(walletAddress);
     return this.validateWalletFormatUseCase.execute(dto);
   }
@@ -26,7 +28,9 @@ export class WalletService {
   /**
    * Fully verifies wallet address including network validation
    */
-  async verifyWallet(walletAddress: string): Promise<WalletVerificationResponseDto> {
+  async verifyWallet(
+    walletAddress: string
+  ): Promise<WalletVerificationResponseDto> {
     const dto = new WalletVerificationRequestDto(walletAddress);
     return this.verifyWalletUseCase.execute(dto);
   }
@@ -39,7 +43,7 @@ export class WalletService {
     try {
       const result = await this.verifyWallet(walletAddress);
       return result.success && result.isValid;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

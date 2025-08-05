@@ -65,7 +65,9 @@ async function setupS3Bucket() {
     if (error.name === "BucketAlreadyExists") {
       console.log(`✅ Bucket "${bucketName}" already exists`);
     } else if (error.name === "BucketAlreadyOwnedByYou") {
-      console.log(`✅ Bucket "${bucketName}" already exists and is owned by you`);
+      console.log(
+        `✅ Bucket "${bucketName}" already exists and is owned by you`
+      );
     } else {
       console.error("❌ Error setting up S3 bucket:", error);
     }

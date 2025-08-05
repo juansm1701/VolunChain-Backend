@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import { Request } from "express";
 
 /**
  * Unified Authentication Types
@@ -51,22 +51,26 @@ export interface LegacyUser {
  * Type guard to check if user has required authentication properties
  */
 export function isAuthenticatedUser(user: any): user is AuthenticatedUser {
-  return user &&
-         (typeof user.id === 'string' || typeof user.id === 'number') &&
-         typeof user.email === 'string' &&
-         typeof user.role === 'string' &&
-         typeof user.isVerified === 'boolean';
+  return (
+    user &&
+    (typeof user.id === "string" || typeof user.id === "number") &&
+    typeof user.email === "string" &&
+    typeof user.role === "string" &&
+    typeof user.isVerified === "boolean"
+  );
 }
 
 /**
  * Helper function to convert DecodedUser to AuthenticatedUser
  */
-export function toAuthenticatedUser(decodedUser: DecodedUser): AuthenticatedUser {
+export function toAuthenticatedUser(
+  decodedUser: DecodedUser
+): AuthenticatedUser {
   return {
     id: decodedUser.id,
     email: decodedUser.email,
-    role: decodedUser.role || 'user',
-    isVerified: decodedUser.isVerified || false
+    role: decodedUser.role || "user",
+    isVerified: decodedUser.isVerified || false,
   };
 }
 
@@ -77,7 +81,7 @@ export const toLegacyUser = (user: AuthenticatedUser): LegacyUser => ({
   id: user.id,
   role: user.role,
   isVerified: user.isVerified,
-  email: user.email
+  email: user.email,
 });
 
 // Global Express namespace extension

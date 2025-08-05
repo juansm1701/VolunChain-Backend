@@ -8,18 +8,18 @@ export class VolunteerRegistrationError extends DomainException {
 
 export class VolunteerPositionFullError extends VolunteerRegistrationError {
   constructor() {
-    super('Volunteer position is full');
+    super("Volunteer position is full");
   }
 }
 
 export class VolunteerAlreadyRegisteredError extends VolunteerRegistrationError {
   constructor() {
-    super('User is already registered for this volunteer position');
+    super("User is already registered for this volunteer position");
   }
 }
 
 export class VolunteerNotFoundError extends VolunteerRegistrationError {
   constructor() {
-    super('Volunteer position not found');
+    super("Volunteer position not found");
   }
-} 
+}

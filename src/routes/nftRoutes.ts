@@ -1,5 +1,5 @@
 import { Router } from "express";
-import NFTController from "../controllers/NFTController";
+import NFTController from "../modules/nft/presentation/controllers/NFTController.stub";
 import { body } from "express-validator";
 
 const router = Router();

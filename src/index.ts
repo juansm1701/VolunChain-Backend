@@ -20,9 +20,11 @@ import certificateRoutes from "./routes/certificatesRoutes";
 import volunteerRoutes from "./routes/VolunteerRoutes";
 import projectRoutes from "./routes/ProjectRoutes";
 import organizationRoutes from "./routes/OrganizationRoutes";
-import messageRoutes from './modules/messaging/routes/messaging.routes';
+import messageRoutes from "./modules/messaging/routes/messaging.routes";
 import testRoutes from "./routes/testRoutes";
-import { globalLogger } from "./services/logger.service";
+import { Logger } from "./utils/logger";
+
+const globalLogger = new Logger("VolunChain");
 import fs from "fs";
 import path from "path";
 
@@ -31,15 +33,15 @@ const PORT = process.env.PORT || 3000;
 const ENV = process.env.NODE_ENV || "development";
 
 // Ensure logs directory exists
-const logsDir = path.join(process.cwd(), 'logs');
+const logsDir = path.join(process.cwd(), "logs");
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
 
-globalLogger.info("Starting VolunChain API...", undefined, {
+globalLogger.info("Starting VolunChain API...", {
   environment: ENV,
   port: PORT,
-  nodeVersion: process.version
+  nodeVersion: process.version,
 });
 
 // Trace ID middleware (must be first to ensure all requests have trace IDs)
@@ -184,10 +186,13 @@ prisma
         globalLogger.info("Cron jobs initialized successfully!");
 
         app.listen(PORT, () => {
-          globalLogger.info(`Server is running on http://localhost:${PORT}`, undefined, {
-            port: PORT,
-            environment: ENV
-          });
+          globalLogger.info(
+            `Server is running on http://localhost:${PORT}`,
+            {
+              port: PORT,
+              environment: ENV,
+            }
+          );
 
           if (ENV === "development") {
             globalLogger.info(

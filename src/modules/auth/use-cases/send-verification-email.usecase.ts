@@ -1,26 +1,31 @@
 import jwt from "jsonwebtoken";
-import { IUserRepository } from '../../user/domain/interfaces/IUserRepository';
-import { EmailVerificationRequestDTO, EmailVerificationResponseDTO } from '../dto/email-verification.dto';
-import { sendEmail } from '../utils/email.utils';
+import { IUserRepository } from "../../user/domain/interfaces/IUserRepository";
+import {
+  EmailVerificationRequestDTO,
+  EmailVerificationResponseDTO,
+} from "../dto/email-verification.dto";
+import { sendEmail } from "../utils/email.utils";
 
 export class SendVerificationEmailUseCase {
   constructor(private userRepository: IUserRepository) {}
 
-  async execute(dto: EmailVerificationRequestDTO): Promise<EmailVerificationResponseDTO> {
+  async execute(
+    dto: EmailVerificationRequestDTO
+  ): Promise<EmailVerificationResponseDTO> {
     const { email } = dto;
     const EMAIL_SECRET = process.env.EMAIL_SECRET || "emailSecret";
 
     // Find user by email
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     // If user is already verified
     if (user.isVerified) {
       return {
         success: true,
-        message: 'User is already verified',
+        message: "User is already verified",
       };
     }
 
@@ -30,13 +35,17 @@ export class SendVerificationEmailUseCase {
     tokenExpires.setHours(tokenExpires.getHours() + 24); // Token expires in 24 hours
 
     // Save verification token
-    await this.userRepository.setVerificationToken(user.id, token, tokenExpires);
+    await this.userRepository.setVerificationToken(
+      user.id,
+      token,
+      tokenExpires
+    );
 
     // Send verification email
     const verificationLink = `${process.env.BASE_URL}/api/auth/verify-email?token=${token}`;
     await sendEmail({
       to: user.email,
-      subject: 'Email Verification',
+      subject: "Email Verification",
       html: `
         <h1>Email Verification</h1>
         <p>Please click the link below to verify your email address:</p>
@@ -47,7 +56,7 @@ export class SendVerificationEmailUseCase {
 
     return {
       success: true,
-      message: 'Verification email sent successfully',
+      message: "Verification email sent successfully",
     };
   }
 }

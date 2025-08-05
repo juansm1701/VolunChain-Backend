@@ -1,8 +1,8 @@
-import { PrismaClient } from "@prisma/client"
-import { prisma } from "../config/prisma"
-import { Logger } from "./logger"
+import { PrismaClient } from "@prisma/client";
+import { prisma } from "../config/prisma";
+import { Logger } from "./logger";
 
-const logger = new Logger("TransactionHelper")
+const logger = new Logger("TransactionHelper");
 
 /**
  * Transaction Helper Utility
@@ -11,32 +11,43 @@ const logger = new Logger("TransactionHelper")
  * to ensure data consistency and atomicity across multi-step workflows.
  */
 
-import type { Prisma } from "@prisma/client"
+import type { Prisma } from "@prisma/client";
 
-export type TransactionCallback<T> = (tx: Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">) => Promise<T>
+export type TransactionCallback<T> = (
+  tx: Omit<
+    PrismaClient,
+    "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+  >
+) => Promise<T>;
 
 export interface TransactionOptions {
-  maxWait?: number
-  timeout?: number
-  isolationLevel?: "ReadUncommitted" | "ReadCommitted" | "RepeatableRead" | "Serializable"
+  maxWait?: number;
+  timeout?: number;
+  isolationLevel?:
+    | "ReadUncommitted"
+    | "ReadCommitted"
+    | "RepeatableRead"
+    | "Serializable";
 }
 
 export class TransactionHelper {
-  private static instance: TransactionHelper
-  private prismaClient: PrismaClient
+  private static instance: TransactionHelper;
+  private prismaClient: PrismaClient;
 
   private constructor(prismaClient: PrismaClient) {
-    this.prismaClient = prismaClient
+    this.prismaClient = prismaClient;
   }
 
   /**
    * Get singleton instance of TransactionHelper
    */
-  public static getInstance(prismaClient: PrismaClient = prisma): TransactionHelper {
+  public static getInstance(
+    prismaClient: PrismaClient = prisma
+  ): TransactionHelper {
     if (!TransactionHelper.instance) {
-      TransactionHelper.instance = new TransactionHelper(prismaClient)
+      TransactionHelper.instance = new TransactionHelper(prismaClient);
     }
-    return TransactionHelper.instance
+    return TransactionHelper.instance;
   }
 
   /**
@@ -57,40 +68,43 @@ export class TransactionHelper {
    * });
    * ```
    */
-  public async executeInTransaction<T>(callback: TransactionCallback<T>, options: TransactionOptions = {}): Promise<T> {
-    const startTime = Date.now()
-    const transactionId = this.generateTransactionId()
+  public async executeInTransaction<T>(
+    callback: TransactionCallback<T>,
+    options: TransactionOptions = {}
+  ): Promise<T> {
+    const startTime = Date.now();
+    const transactionId = this.generateTransactionId();
 
     try {
       logger.info(`Starting transaction ${transactionId}`, {
         transactionId,
         options,
-      })
+      });
 
       const result = await this.prismaClient.$transaction(callback, {
         maxWait: options.maxWait || 5000, // 5 seconds default
         timeout: options.timeout || 10000, // 10 seconds default
         isolationLevel: options.isolationLevel || "ReadCommitted",
-      })
+      });
 
-      const duration = Date.now() - startTime
+      const duration = Date.now() - startTime;
       logger.info(`Transaction ${transactionId} completed successfully`, {
         transactionId,
         duration: `${duration}ms`,
-      })
+      });
 
-      return result
+      return result;
     } catch (error) {
-      const duration = Date.now() - startTime
+      const duration = Date.now() - startTime;
       logger.error(`Transaction ${transactionId} failed`, {
         transactionId,
         duration: `${duration}ms`,
         error: error instanceof Error ? error.message : "Unknown error",
         stack: error instanceof Error ? error.stack : undefined,
-      })
+      });
 
       // Re-throw the error to maintain the original error handling flow
-      throw error
+      throw error;
     }
   }
 
@@ -103,11 +117,11 @@ export class TransactionHelper {
    */
   public async executeParallelInTransaction<T>(
     operations: TransactionCallback<T>[],
-    options: TransactionOptions = {},
+    options: TransactionOptions = {}
   ): Promise<T[]> {
     return this.executeInTransaction(async (tx) => {
-      return Promise.all(operations.map((operation) => operation(tx)))
-    }, options)
+      return Promise.all(operations.map((operation) => operation(tx)));
+    }, options);
   }
 
   /**
@@ -119,16 +133,16 @@ export class TransactionHelper {
    */
   public async executeSequentialInTransaction<T>(
     operations: TransactionCallback<T>[],
-    options: TransactionOptions = {},
+    options: TransactionOptions = {}
   ): Promise<T[]> {
     return this.executeInTransaction(async (tx) => {
-      const results: T[] = []
+      const results: T[] = [];
       for (const operation of operations) {
-        const result = await operation(tx)
-        results.push(result)
+        const result = await operation(tx);
+        results.push(result);
       }
-      return results
-    }, options)
+      return results;
+    }, options);
   }
 
   /**
@@ -138,19 +152,19 @@ export class TransactionHelper {
   public isInTransaction(client: any): boolean {
     // Prisma doesn't provide a direct way to check if we're in a transaction
     // This is a heuristic based on the client type
-    return client !== this.prismaClient
+    return client !== this.prismaClient;
   }
 
   /**
    * Generate a unique transaction ID for logging purposes
    */
   private generateTransactionId(): string {
-    return `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    return `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 }
 
 // Export singleton instance for easy access
-export const transactionHelper = TransactionHelper.getInstance()
+export const transactionHelper = TransactionHelper.getInstance();
 
 /**
  * Decorator for methods that should run in a transaction
@@ -169,30 +183,37 @@ export const transactionHelper = TransactionHelper.getInstance()
  * ```
  */
 export function WithTransaction(options: TransactionOptions = {}) {
-  return (target: any, propertyName: string, descriptor: PropertyDescriptor) => {
-    const method = descriptor.value
+  return (
+    target: any,
+    propertyName: string,
+    descriptor: PropertyDescriptor
+  ) => {
+    const method = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
-      const helper = TransactionHelper.getInstance()
+      const helper = TransactionHelper.getInstance();
       return helper.executeInTransaction(async (tx) => {
         // Replace the prisma instance with the transaction client
-        const hasPrisma = Object.prototype.hasOwnProperty.call(this, "prisma")
-        const originalPrisma = hasPrisma ? (this as any).prisma : (this as any).prismaClient
+        const hasPrisma = Object.prototype.hasOwnProperty.call(this, "prisma");
+        const originalPrisma = hasPrisma
+          ? (this as any).prisma
+          : (this as any).prismaClient;
         if (hasPrisma && typeof (this as any).prisma !== "function") {
-          (this as any).prisma = tx
+          (this as any).prisma = tx;
         }
-        (this as any).prismaClient = tx
+        (this as any).prismaClient = tx;
 
         try {
-          return await method.apply(this, args)
+          return await method.apply(this, args);
         } finally {
           // Restore original prisma instance
-          if (hasPrisma) (this as any).prisma = originalPrisma
-          (this as any).prismaClient = originalPrisma
+          if (hasPrisma)
+            (this as any).prisma = originalPrisma(this as any).prismaClient =
+              originalPrisma;
         }
-      }, options)
-    }
-  }
+      }, options);
+    };
+  };
 }
 
 /**
@@ -204,7 +225,7 @@ export function WithTransaction(options: TransactionOptions = {}) {
  */
 export async function withTransaction<T>(
   callback: TransactionCallback<T>,
-  options: TransactionOptions = {},
+  options: TransactionOptions = {}
 ): Promise<T> {
-  return transactionHelper.executeInTransaction(callback, options)
+  return transactionHelper.executeInTransaction(callback, options);
 }

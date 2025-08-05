@@ -5,7 +5,7 @@ import {
   RequestHandler,
   NextFunction,
 } from "express";
-import UserController from "../controllers/UserController";
+import UserController from "../modules/user/presentation/controllers/UserController.stub";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { AuthenticatedRequest } from "../types/auth.types";
 

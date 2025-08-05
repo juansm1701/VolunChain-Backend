@@ -1,6 +1,6 @@
-import { Entity, Column, OneToMany } from "typeorm"
-import { BaseEntity } from "../../../shared/domain/entities/base.entity"
-import { Volunteer } from "@/modules/volunteer/domain/entities/volunteer.entity"
+import { Entity, Column, OneToMany } from "typeorm";
+import { BaseEntity } from "../../../shared/domain/entities/base.entity";
+import { Volunteer } from "@/modules/volunteer/domain/entities/volunteer.entity";
 
 export enum ProjectStatus {
   DRAFT = "DRAFT",
@@ -12,63 +12,60 @@ export enum ProjectStatus {
 @Entity("projects")
 export class Project extends BaseEntity {
   @Column({ type: "varchar", length: 255, nullable: false })
-  name: string
+  name: string;
 
   @Column({ type: "text", nullable: false })
-  description: string
+  description: string;
 
   @Column({ type: "varchar", length: 255, nullable: false })
-  location: string
+  location: string;
 
   @Column({ type: "date", nullable: false })
-  startDate: Date
+  startDate: Date;
 
   @Column({ type: "date", nullable: false })
-  endDate: Date
+  endDate: Date;
 
   @Column({ type: "uuid", nullable: false })
-  organizationId: string
+  organizationId: string;
 
   @Column({
     type: "enum",
     enum: ProjectStatus,
     default: ProjectStatus.DRAFT,
   })
-  status: ProjectStatus
+  status: ProjectStatus;
 
-  @OneToMany(
-    () => Volunteer,
-    (volunteer) => volunteer.project,
-  )
-  volunteers?: Volunteer[]
+  @OneToMany(() => Volunteer, (volunteer) => volunteer.project)
+  volunteers?: Volunteer[];
 
   // Domain methods
   public activate(): void {
     if (this.status !== ProjectStatus.DRAFT) {
-      throw new Error("Only draft projects can be activated")
+      throw new Error("Only draft projects can be activated");
     }
-    this.status = ProjectStatus.ACTIVE
+    this.status = ProjectStatus.ACTIVE;
   }
 
   public complete(): void {
     if (this.status !== ProjectStatus.ACTIVE) {
-      throw new Error("Only active projects can be completed")
+      throw new Error("Only active projects can be completed");
     }
-    this.status = ProjectStatus.COMPLETED
+    this.status = ProjectStatus.COMPLETED;
   }
 
   public cancel(): void {
     if (this.status === ProjectStatus.COMPLETED) {
-      throw new Error("Completed projects cannot be cancelled")
+      throw new Error("Completed projects cannot be cancelled");
     }
-    this.status = ProjectStatus.CANCELLED
+    this.status = ProjectStatus.CANCELLED;
   }
 
   public isActive(): boolean {
-    return this.status === ProjectStatus.ACTIVE
+    return this.status === ProjectStatus.ACTIVE;
   }
 
   public isCompleted(): boolean {
-    return this.status === ProjectStatus.COMPLETED
+    return this.status === ProjectStatus.COMPLETED;
   }
 }

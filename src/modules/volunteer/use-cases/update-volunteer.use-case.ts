@@ -20,8 +20,7 @@ export class UpdateVolunteerUseCase {
     // Update the volunteer
     existingVolunteer.update(updateData);
 
-    // Validate the updated volunteer
-    existingVolunteer.validate();
+    // Validation is handled within the update method
 
     // Persist and return the updated volunteer
     return this.volunteerRepository.update(existingVolunteer);

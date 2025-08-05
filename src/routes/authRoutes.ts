@@ -1,21 +1,26 @@
 import { Router } from "express";
-import AuthController from "../controllers/Auth.controller";
-import authMiddleware from "../middleware/authMiddleware";
+import AuthController from "../modules/auth/presentation/controllers/Auth.controller.stub";
+// import authMiddleware from "../middleware/authMiddleware"; // Temporarily disabled
 
 const router = Router();
 
-// Public routes
-router.post('/register', AuthController.register);
-router.post('/login', AuthController.login);
+// Health check for auth module
+router.get("/health", (req, res) => {
+  res.json({ status: "Auth module is available", module: "auth" });
+});
 
-router.post('/send-verification-email', AuthController.resendVerificationEmail);
-router.get('/verify-email/:token', AuthController.verifyEmail);
-router.get('/verify-email', AuthController.verifyEmail); // Support query param method
-router.post('/resend-verification', AuthController.resendVerificationEmail);
+// Public routes (using stub controller during migration)
+router.post("/register", AuthController.register);
+router.post("/login", AuthController.login);
+
+router.post("/send-verification-email", AuthController.resendVerificationEmail);
+router.get("/verify-email/:token", AuthController.verifyEmail);
+router.get("/verify-email", AuthController.verifyEmail); // Support query param method
+router.post("/resend-verification", AuthController.resendVerificationEmail);
 
 // Wallet verification routes
-router.post('/verify-wallet', AuthController.verifyWallet);
-router.post('/validate-wallet-format', AuthController.validateWalletFormat);
+router.post("/verify-wallet", AuthController.verifyWallet);
+router.post("/validate-wallet-format", AuthController.validateWalletFormat);
 
 // Protected routes - temporarily commented out due to interface mismatch
 // router.get('/protected', authMiddleware.authMiddleware, AuthController.protectedRoute);

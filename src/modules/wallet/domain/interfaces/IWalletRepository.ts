@@ -1,5 +1,5 @@
-import { WalletVerification } from '../entities/WalletVerification';
-import { StellarAddress } from '../value-objects/StellarAddress';
+import { WalletVerification } from "../entities/WalletVerification";
+import { StellarAddress } from "../value-objects/StellarAddress";
 
 export interface IWalletRepository {
   /**

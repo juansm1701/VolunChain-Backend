@@ -1,4 +1,4 @@
-import { Photo } from '@/entities/Photo';
+import { Photo } from "../modules/photo/domain/entities/photo.entity";
 
 export interface IPhotoRepository {
   findById(id: string): Promise<Photo | null>;

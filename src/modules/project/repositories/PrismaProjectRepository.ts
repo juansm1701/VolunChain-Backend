@@ -22,7 +22,7 @@
 
 //   async findAll(): Promise<Project[]> {
 //     const projects = await this.prisma.project.findMany();
-//     return projects.map(project => 
+//     return projects.map(project =>
 //       Project.create({
 //         title: project.title,
 //         description: project.description,
@@ -36,7 +36,7 @@
 //     const projects = await this.prisma.project.findMany({
 //       where: { organizationId }
 //     });
-//     return projects.map(project => 
+//     return projects.map(project =>
 //       Project.create({
 //         title: project.title,
 //         description: project.description,
@@ -92,4 +92,4 @@
 //       where: { id }
 //     });
 //   }
-// } 
+// }

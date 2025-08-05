@@ -1,6 +1,7 @@
 import { CreateOrganizationDto } from "../../presentation/dto/create-organization.dto";
 import { Organization } from "../../domain/entities/organization.entity";
 import { IOrganizationRepository } from "../../domain/interfaces/organization-repository.interface";
+import { randomUUID } from "crypto";
 
 export class CreateOrganizationUseCase {
   constructor(
@@ -9,6 +10,7 @@ export class CreateOrganizationUseCase {
 
   async execute(dto: CreateOrganizationDto): Promise<Organization> {
     const organizationProps = {
+      id: randomUUID(),
       name: dto.name,
       email: dto.email,
       description: dto.description,

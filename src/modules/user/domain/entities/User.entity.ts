@@ -1,31 +1,31 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm"
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("users")
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
-  id: string
+  id: string;
 
   @Column()
-  name: string
+  name: string;
 
   @Column()
-  lastName: string
+  lastName: string;
 
   @Column({ unique: true })
-  email: string
+  email: string;
 
   @Column()
-  password: string
+  password: string;
 
   @Column({ unique: true })
-  wallet: string
+  wallet: string;
 
   @Column({ default: false })
-  isVerified: boolean
+  isVerified: boolean;
 
   @Column({ nullable: true })
-  verificationToken: string
+  verificationToken: string;
 
   @Column({ type: "timestamp", nullable: true })
-  verificationTokenExpires: Date
+  verificationTokenExpires: Date;
 }

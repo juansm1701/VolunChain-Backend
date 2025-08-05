@@ -1,5 +1,5 @@
 import { INFTRepository } from "../repositories/INFTRepository";
-import { NFT } from "../domain/entities/nft.entity";
+import { NFTDomain as NFT } from "../domain/entities/nft.entity";
 import { CreateNFTDto } from "../dto/create-nft.dto";
 
 export class CreateNFT {

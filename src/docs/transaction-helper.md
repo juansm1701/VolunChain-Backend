@@ -22,11 +22,11 @@ The Transaction Helper utility provides a robust, reusable solution for managing
 import { withTransaction } from '../utils/transaction.helper';
 
 const result = await withTransaction(async (tx) => {
-  const user = await tx.user.create({ data: userData });
-  const profile = await tx.profile.create({ 
-    data: { ...profileData, userId: user.id } 
-  });
-  return { user, profile };
+const user = await tx.user.create({ data: userData });
+const profile = await tx.profile.create({
+data: { ...profileData, userId: user.id }
+});
+return { user, profile };
 });
 \`\`\`
 
@@ -36,11 +36,11 @@ const result = await withTransaction(async (tx) => {
 import { transactionHelper } from '../utils/transaction.helper';
 
 const result = await transactionHelper.executeInTransaction(async (tx) => {
-  // Your transactional operations here
-  return someResult;
+// Your transactional operations here
+return someResult;
 }, {
-  timeout: 15000,
-  isolationLevel: 'Serializable'
+timeout: 15000,
+isolationLevel: 'Serializable'
 });
 \`\`\`
 
@@ -50,9 +50,9 @@ const result = await transactionHelper.executeInTransaction(async (tx) => {
 
 \`\`\`typescript
 const operations = [
-  (tx) => tx.user.create({ data: user1Data }),
-  (tx) => tx.user.create({ data: user2Data }),
-  (tx) => tx.user.create({ data: user3Data }),
+(tx) => tx.user.create({ data: user1Data }),
+(tx) => tx.user.create({ data: user2Data }),
+(tx) => tx.user.create({ data: user3Data }),
 ];
 
 const users = await transactionHelper.executeParallelInTransaction(operations);
@@ -62,9 +62,9 @@ const users = await transactionHelper.executeParallelInTransaction(operations);
 
 \`\`\`typescript
 const operations = [
-  (tx) => tx.organization.create({ data: orgData }),
-  (tx) => tx.project.create({ data: { ...projectData, organizationId: org.id } }),
-  (tx) => tx.volunteer.createMany({ data: volunteersData }),
+(tx) => tx.organization.create({ data: orgData }),
+(tx) => tx.project.create({ data: { ...projectData, organizationId: org.id } }),
+(tx) => tx.volunteer.createMany({ data: volunteersData }),
 ];
 
 const results = await transactionHelper.executeSequentialInTransaction(operations);
@@ -76,15 +76,15 @@ const results = await transactionHelper.executeSequentialInTransaction(operation
 import { WithTransaction } from '../utils/transaction.helper';
 
 class ProjectService {
-  @WithTransaction({ timeout: 20000 })
-  async createProjectWithVolunteers(projectData: any, volunteersData: any[]) {
-    // This method automatically runs in a transaction
-    const project = await this.prisma.project.create({ data: projectData });
-    const volunteers = await this.prisma.volunteer.createMany({
-      data: volunteersData.map(v => ({ ...v, projectId: project.id }))
-    });
-    return { project, volunteers };
-  }
+@WithTransaction({ timeout: 20000 })
+async createProjectWithVolunteers(projectData: any, volunteersData: any[]) {
+// This method automatically runs in a transaction
+const project = await this.prisma.project.create({ data: projectData });
+const volunteers = await this.prisma.volunteer.createMany({
+data: volunteersData.map(v => ({ ...v, projectId: project.id }))
+});
+return { project, volunteers };
+}
 }
 \`\`\`
 
@@ -94,16 +94,16 @@ class ProjectService {
 
 \`\`\`typescript
 interface TransactionOptions {
-  maxWait?: number;        // Maximum wait time for transaction to start (default: 5000ms)
-  timeout?: number;        // Transaction timeout (default: 10000ms)
-  isolationLevel?: 'ReadUncommitted' | 'ReadCommitted' | 'RepeatableRead' | 'Serializable';
+maxWait?: number; // Maximum wait time for transaction to start (default: 5000ms)
+timeout?: number; // Transaction timeout (default: 10000ms)
+isolationLevel?: 'ReadUncommitted' | 'ReadCommitted' | 'RepeatableRead' | 'Serializable';
 }
 \`\`\`
 
 ### Default Configuration
 
 - **maxWait**: 5 seconds
-- **timeout**: 10 seconds  
+- **timeout**: 10 seconds
 - **isolationLevel**: ReadCommitted
 
 ## Error Handling
@@ -112,14 +112,14 @@ The transaction helper provides comprehensive error handling:
 
 \`\`\`typescript
 try {
-  const result = await withTransaction(async (tx) => {
-    // Your operations
-    throw new Error('Something went wrong');
-  });
+const result = await withTransaction(async (tx) => {
+// Your operations
+throw new Error('Something went wrong');
+});
 } catch (error) {
-  // Original error is preserved and re-thrown
-  // Transaction is automatically rolled back
-  console.error('Transaction failed:', error.message);
+// Original error is preserved and re-thrown
+// Transaction is automatically rolled back
+console.error('Transaction failed:', error.message);
 }
 \`\`\`
 
@@ -145,15 +145,15 @@ INFO: Transaction tx_1704067200000_abc123def completed successfully (duration: 1
 \`\`\`typescript
 // ✅ Good - Short, focused transaction
 await withTransaction(async (tx) => {
-  const user = await tx.user.create({ data: userData });
-  await tx.profile.create({ data: { userId: user.id, ...profileData } });
+const user = await tx.user.create({ data: userData });
+await tx.profile.create({ data: { userId: user.id, ...profileData } });
 });
 
 // ❌ Avoid - Long-running operations in transaction
 await withTransaction(async (tx) => {
-  const user = await tx.user.create({ data: userData });
-  await sendWelcomeEmail(user.email); // External API call
-  await generateUserReport(user.id);  // Heavy computation
+const user = await tx.user.create({ data: userData });
+await sendWelcomeEmail(user.email); // External API call
+await generateUserReport(user.id); // Heavy computation
 });
 \`\`\`
 
@@ -161,17 +161,17 @@ await withTransaction(async (tx) => {
 
 \`\`\`typescript
 try {
-  await withTransaction(async (tx) => {
-    // Operations
-  });
+await withTransaction(async (tx) => {
+// Operations
+});
 } catch (error) {
-  if (error instanceof ValidationError) {
-    // Handle validation errors
-  } else if (error instanceof DatabaseError) {
-    // Handle database errors
-  } else {
-    // Handle unexpected errors
-  }
+if (error instanceof ValidationError) {
+// Handle validation errors
+} else if (error instanceof DatabaseError) {
+// Handle database errors
+} else {
+// Handle unexpected errors
+}
 }
 \`\`\`
 
@@ -180,12 +180,12 @@ try {
 \`\`\`typescript
 // For read-heavy operations
 await withTransaction(async (tx) => {
-  // Read operations
+// Read operations
 }, { isolationLevel: 'ReadCommitted' });
 
 // For critical financial operations
 await withTransaction(async (tx) => {
-  // Critical operations
+// Critical operations
 }, { isolationLevel: 'Serializable' });
 \`\`\`
 
@@ -198,13 +198,13 @@ The ProjectService has been updated to use transactions for all multi-step opera
 \`\`\`typescript
 // Creating project with volunteers
 await withTransaction(async (tx) => {
-  const project = await tx.project.create({ data: projectData });
-  if (initialVolunteers.length > 0) {
-    await tx.volunteer.createMany({
-      data: initialVolunteers.map(v => ({ ...v, projectId: project.id }))
-    });
-  }
-  return project;
+const project = await tx.project.create({ data: projectData });
+if (initialVolunteers.length > 0) {
+await tx.volunteer.createMany({
+data: initialVolunteers.map(v => ({ ...v, projectId: project.id }))
+});
+}
+return project;
 });
 \`\`\`
 
@@ -212,16 +212,17 @@ await withTransaction(async (tx) => {
 
 \`\`\`typescript
 async createProjectWithRetry(projectData: any, maxRetries = 3) {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      return await this.createProject(projectData);
-    } catch (error) {
-      if (attempt === maxRetries) throw error;
-      
+for (let attempt = 1; attempt <= maxRetries; attempt++) {
+try {
+return await this.createProject(projectData);
+} catch (error) {
+if (attempt === maxRetries) throw error;
+
       // Wait before retry (exponential backoff)
       await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
     }
-  }
+
+}
 }
 \`\`\`
 
@@ -253,12 +254,12 @@ npm test -- tests/utils/transaction.helper.test.ts
 
 \`\`\`typescript
 async createProject(data: any) {
-  const project = await this.prisma.project.create({ data });
-  // If this fails, project is already created (inconsistent state)
-  await this.prisma.volunteer.createMany({ 
-    data: volunteers.map(v => ({ ...v, projectId: project.id }))
-  });
-  return project;
+const project = await this.prisma.project.create({ data });
+// If this fails, project is already created (inconsistent state)
+await this.prisma.volunteer.createMany({
+data: volunteers.map(v => ({ ...v, projectId: project.id }))
+});
+return project;
 }
 \`\`\`
 
@@ -266,13 +267,13 @@ async createProject(data: any) {
 
 \`\`\`typescript
 async createProject(data: any) {
-  return await withTransaction(async (tx) => {
-    const project = await tx.project.create({ data });
-    await tx.volunteer.createMany({ 
-      data: volunteers.map(v => ({ ...v, projectId: project.id }))
-    });
-    return project;
-  });
+return await withTransaction(async (tx) => {
+const project = await tx.project.create({ data });
+await tx.volunteer.createMany({
+data: volunteers.map(v => ({ ...v, projectId: project.id }))
+});
+return project;
+});
 }
 \`\`\`
 

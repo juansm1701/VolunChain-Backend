@@ -41,38 +41,40 @@ export class PrismaUserRepository implements IUserRepository {
     await prisma.user.delete({ where: { id } });
   }
 
-
   async findByVerificationToken(token: string): Promise<any | null> {
     return prisma.user.findFirst({ where: { verificationToken: token } });
   }
 
-  async setVerificationToken(userId: string, token: string, expires: Date): Promise<void> {
+  async setVerificationToken(
+    userId: string,
+    token: string,
+    expires: Date
+  ): Promise<void> {
     await prisma.user.update({
       where: { id: userId },
-      data: { 
+      data: {
         verificationToken: token,
-        verificationTokenExpires: expires 
-      }
+        verificationTokenExpires: expires,
+      },
     });
   }
 
   async verifyUser(userId: string): Promise<void> {
     await prisma.user.update({
       where: { id: userId },
-      data: { 
+      data: {
         isVerified: true,
         verificationToken: null,
-        verificationTokenExpires: null
-      }
+        verificationTokenExpires: null,
+      },
     });
   }
 
   async isUserVerified(userId: string): Promise<boolean> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { isVerified: true }
+      select: { isVerified: true },
     });
     return user?.isVerified || false;
   }
-    
 }

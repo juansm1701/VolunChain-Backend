@@ -5,9 +5,9 @@ const apiRouter = Router();
 
 /**
  * API Versioning Router
- * 
+ *
  * This router handles API versioning by namespacing routes under version prefixes.
- * 
+ *
  * Current versions:
  * - /v1/ - Current stable API version
  * - /v2/ - Reserved for future expansion
@@ -27,15 +27,15 @@ apiRouter.get("/", (req, res) => {
       v1: {
         status: "stable",
         description: "Current stable API version",
-        endpoints: "/v1/"
+        endpoints: "/v1/",
       },
       v2: {
         status: "reserved",
         description: "Reserved for future expansion",
-        endpoints: "/v2/"
-      }
+        endpoints: "/v2/",
+      },
     },
-    documentation: "/api/docs"
+    documentation: "/api/docs",
   });
 });
 
