@@ -18,6 +18,8 @@ import { PrismaUserRepository } from "../../../user/repositories/PrismaUserRepos
 import { SendVerificationEmailUseCase } from "../../use-cases/send-verification-email.usecase";
 import { ResendVerificationEmailUseCase } from "../../use-cases/resend-verification-email.usecase";
 import { VerifyEmailUseCase } from "../../use-cases/verify-email.usecase";
+import { ValidateWalletFormatUseCase } from "../../use-cases/wallet-format-validation.usecase";
+import { VerifyWalletUseCase } from "../../use-cases/verify-wallet.usecase";
 
 const userRepository = new PrismaUserRepository();
 const sendVerificationEmailUseCase = new SendVerificationEmailUseCase(
@@ -27,6 +29,8 @@ const resendVerificationEmailUseCase = new ResendVerificationEmailUseCase(
   userRepository
 );
 const verifyEmailUseCase = new VerifyEmailUseCase(userRepository);
+const validateWalletFormatUseCase = new ValidateWalletFormatUseCase();
+const verifyWalletUseCase = new VerifyWalletUseCase();
 
 // DTO validator
 async function validateOr400<T>(
@@ -105,13 +109,11 @@ const verifyEmail = async (req: Request, res: Response) => {
 
   // if token is not given in the request
   if (!token) {
-    res
-      .status(400)
-      .json({
-        success: false,
-        message: "Token in URL is required",
-        verified: false,
-      });
+    res.status(400).json({
+      success: false,
+      message: "Token in URL is required",
+      verified: false,
+    });
     return;
   }
 
@@ -121,13 +123,11 @@ const verifyEmail = async (req: Request, res: Response) => {
     const status = result.success ? 200 : 400;
     res.status(status).json(result);
   } catch {
-    res
-      .status(400)
-      .json({
-        success: false,
-        message: "Invalid or expired verification token",
-        verified: false,
-      });
+    res.status(400).json({
+      success: false,
+      message: "Invalid or expired verification token",
+      verified: false,
+    });
   }
 };
 
@@ -135,22 +135,31 @@ const verifyWallet = async (req: Request, res: Response) => {
   const dto = await validateOr400(VerifyWalletDto, req.body, res);
   if (!dto) return;
 
-  // TODO: add logic for verifying wallet
-  res.status(501).json({
-    message: "Wallet verification temporarily disabled",
-    error: "Wallet verification not implemented yet",
-  });
+  try {
+    const result = await verifyWalletUseCase.execute(dto);
+    const status = result.verified ? 200 : 400;
+    res.status(status).json(result);
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Wallet verification failed";
+    res.status(500).json({ error: message });
+  }
 };
 
 const validateWalletFormat = async (req: Request, res: Response) => {
   const dto = await validateOr400(ValidateWalletFormatDto, req.body, res);
   if (!dto) return;
 
-  // TODO: add logic for validation of wallet format
-  res.status(501).json({
-    message: "Wallet format validation temporarily disabled",
-    error: "Wallet format validation not implemented yet",
-  });
+  try {
+    // Validates wallet format using use case
+    const result = await validateWalletFormatUseCase.execute(dto);
+    const status = result.valid ? 200 : 400;
+    res.status(status).json(result);
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Wallet format validation failed";
+    res.status(500).json({ error: message });
+  }
 };
 
 export default {
