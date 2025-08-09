@@ -1,5 +1,5 @@
 import { Router } from "express";
-import AuthController from "../modules/auth/presentation/controllers/Auth.controller.stub";
+import AuthController from "../modules/auth/presentation/controllers/Auth.controller";
 // import authMiddleware from "../middleware/authMiddleware"; // Temporarily disabled
 
 const router = Router();
@@ -9,7 +9,7 @@ router.get("/health", (req, res) => {
   res.json({ status: "Auth module is available", module: "auth" });
 });
 
-// Public routes (using stub controller during migration)
+// Public routes (now using functional controller)
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
 

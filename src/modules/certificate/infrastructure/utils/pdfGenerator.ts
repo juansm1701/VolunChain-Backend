@@ -1,7 +1,7 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import fs from "fs";
 import path from "path";
-import { generateQRCode } from "./qrGenerator";
+// import { generateQRCode } from "./qrGenerator"; //Function not found, commented out
 import { format } from "date-fns";
 
 export async function generateCertificate({
