@@ -99,9 +99,7 @@ export class RegisterUseCase {
         response = {
           success: true,
           message: "User registered successfully",
-          userId: user.id,
           profile: {
-            id: user.id,
             name: user.name,
             email: user.email,
             wallet: user.wallet,
@@ -128,9 +126,7 @@ export class RegisterUseCase {
         response = {
           success: true,
           message: "Organization registered successfully",
-          organizationId: organization.id,
           profile: {
-            id: organization.id,
             name: organization.name,
             email: organization.email,
             wallet: organization.wallet,

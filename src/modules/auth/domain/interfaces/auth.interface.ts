@@ -20,7 +20,6 @@ export interface IOrganization {
 }
 
 export interface IProfile {
-  id: string;
   name: string;
   email: string;
   wallet: string;
@@ -51,8 +50,6 @@ export interface ILoginResponse {
 export interface IRegisterResponse {
   success: boolean;
   message: string;
-  userId?: string;
-  organizationId?: string;
   profile?: IProfile;
 }
 

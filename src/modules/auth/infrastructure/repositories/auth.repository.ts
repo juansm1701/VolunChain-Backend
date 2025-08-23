@@ -71,7 +71,6 @@ export class AuthRepository {
       const user = await this.findUserByWallet(normalizedAddress);
       if (user) {
         return {
-          id: user.id,
           name: user.name,
           email: user.email,
           wallet: user.wallet,
@@ -84,7 +83,6 @@ export class AuthRepository {
         await this.findOrganizationByWallet(normalizedAddress);
       if (organization) {
         return {
-          id: organization.id,
           name: organization.name,
           email: organization.email,
           wallet: organization.wallet,

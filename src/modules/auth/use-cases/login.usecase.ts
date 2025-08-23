@@ -53,7 +53,7 @@ export class LoginUseCase {
 
       // Generate JWT token
       const token = JWTService.generateToken({
-        userId: profile.id,
+        userId: profile.wallet, // Use wallet as userId for JWT
         email: profile.email,
         profileType: profile.profileType,
       });
@@ -95,7 +95,7 @@ export class LoginUseCase {
       // Verify and decode token
       const payload = JWTService.verifyToken(token);
 
-      // Find profile by user ID from token
+      // Find profile by wallet address from token
       const profile = await this.authRepository.findProfileByWallet(
         payload.userId
       );
@@ -147,7 +147,7 @@ export class LoginUseCase {
 
       // Generate new token
       const newToken = JWTService.generateToken({
-        userId: validationResult.data.id,
+        userId: validationResult.data.wallet, // Use wallet as userId
         email: validationResult.data.email,
         profileType: validationResult.data.profileType,
       });
